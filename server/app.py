@@ -1,6 +1,6 @@
-from flask import Flask
+from flask import Flask, jsonify
 from config import Config
-from models import db
+from models import db, Vehicle
 from flask_cors import CORS
 from flask_migrate import Migrate
 
@@ -13,6 +13,16 @@ CORS(app, support_credentials=True)
 migrate = Migrate(app, db)
 
 #define your routes here
+@app.route('/api/vehicles', methods=['GET'])
+def get_vehicles():
+    vehicles = Vehicle.query.all()
+    serialized_vehicles = [vehicle.serialize() for vehicle in vehicles]
+    return jsonify(serialized_vehicles)
+
+@app.route('/api/vehicles/<int:vehicle_id>', methods=['GET'])
+def get_vehicle(vehicle_id):
+    vehicle = Vehicle.query.get_or_404(vehicle_id)
+    return jsonify(vehicle.serialize())
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(port=5500)
