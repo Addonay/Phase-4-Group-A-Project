@@ -7,3 +7,8 @@ wtforms
 werkzeug
 guinicorn
 sqlalchemy
+email-validator
+redis
+flask-login
+flask-bcrypt
+flask-session
