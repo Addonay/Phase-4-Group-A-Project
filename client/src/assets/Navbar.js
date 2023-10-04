@@ -41,6 +41,16 @@ function Navbar() {
                 Home
               </Typography>
             </Link>
+            <Link to="/login" style={{ textDecoration: 'none', color: 'white' }}>
+              <Typography variant="h6" component="div" sx={{ mr: 2 }}>
+                Login
+              </Typography>
+            </Link>
+            <Link to="/userdashboard" style={{ textDecoration: 'none', color: 'white' }}>
+              <Typography variant="h6" component="div" sx={{ mr: 2 }}>
+                Profile
+              </Typography>
+            </Link>
           </>
         )}
         <IconButton
@@ -62,6 +72,16 @@ function Navbar() {
         <MenuItem onClick={handleMenuClose}>
           <Link to="/" style={{ textDecoration: 'none', color: 'black' }}>
             Home
+          </Link>
+        </MenuItem>
+        <MenuItem onClick={handleMenuClose}>
+          <Link to="/login" style={{ textDecoration: 'none', color: 'black' }}>
+            Login
+          </Link>
+        </MenuItem>
+        <MenuItem onClick={handleMenuClose}>
+          <Link to="/userdashboard" style={{ textDecoration: 'none', color: 'black' }}>
+            Profile
           </Link>
         </MenuItem>
       </Menu>
