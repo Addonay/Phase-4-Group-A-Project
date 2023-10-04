@@ -1,0 +1,22 @@
+.star-rating{
+    margin-top: 5px;
+    margin-left: 10%;
+  }
+  .star-rating button {
+    background-color:#dc3545;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    border-radius: 50px;
+    margin-left: 3px;
+  }
+  .on {
+    color: #FDD017;
+  }
+  .off {
+    color: #fff;
+  }
+  .bg-details{
+    position: relative;
+    bottom: 400px;
+  }
