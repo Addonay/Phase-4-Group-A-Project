@@ -24,34 +24,41 @@ class CommunicationSystem:
         self.enquiries = []
         self.reviews = []
 
-    def send_inquiry(self, sender_name, receiver_name, message):
-        inquiry = Enquiry(sender_name, receiver_name, message)
-        self.enquiries.append(inquiry)
+    def send_enquiry(self, sender_name, receiver_name, message):
+        enquiry = Enquiry(sender_name, receiver_name, message)
+        self.enquiries.append(enquiry)
 
     def send_review(self, author_name, product_name, rating, comment):
-        review = Review(author_name, product_name, rating, comment)
+        review = {
+            "author_name": author_name,
+            "product_name": product_name,
+            "rating": rating,
+            "comment": comment,
+        }
         self.reviews.append(review)
 
     def get_enquiries_for_seller(self, seller_name):
         enquiries_for_seller = []
-        for inquiry in self.enquiries:
-            if inquiry.receiver_name == seller_name:
-                enquiries_for_seller.append(inquiry)
+        for enquiry in self.enquiries:
+            if enquiry.receiver_name == seller_name:
+                enquiries_for_seller.append(enquiry)
         return enquiries_for_seller
 
-    def get_reviews_for_product(self, product_name):
-        reviews_for_product = []
-        for review in self.reviews:
-            if review.product_name == product_name:
-                reviews_for_product.append(review)
-        return reviews_for_product
+    # def get_reviews_for_product(self, product_name):
+    #     reviews_for_product = []
+    #     for review in self.reviews:
+    #         if review.product_name == product_name:
+    #             reviews_for_product.append(review)
+    #     return reviews_for_product
+    def get_reviews(self):
+        return self.reviews
 
 
 if __name__ == "__main__":
     communication_system = CommunicationSystem()
 
-    communication_system.send_inquiry("Buyer 1", "Seller 1", "Is the product in stock?")
-    communication_system.send_inquiry("Buyer 2", "Seller 2", "What are the shipping options?")
+    communication_system.send_enquiry("Buyer 1", "Seller 1", "Is the product in stock?")
+    communication_system.send_enquiry("Buyer 2", "Seller 2", "What are the shipping options?")
 
     communication_system.send_review("Buyer 1", "Product A", 5, "Great product!")
     communication_system.send_review("Buyer 2", "Product B", 4, "Good quality.")
@@ -61,8 +68,8 @@ if __name__ == "__main__":
 
     print(f"enquiries for {seller_name}:")
     enquiries_for_seller = communication_system.get_enquiries_for_seller(seller_name)
-    for inquiry in enquiries_for_seller:
-        print(inquiry)
+    for enquiry in enquiries_for_seller:
+        print(enquiry)
 
     print(f"\nReviews for {product_name}:")
     reviews_for_product = communication_system.get_reviews_for_product(product_name)

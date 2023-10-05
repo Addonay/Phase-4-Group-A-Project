@@ -7,6 +7,37 @@ app = Flask(__name__)
 car_manager = CarManagement()
 communication_system = CommunicationSystem()
 
+car_manager.add_car("Toyota", "Camry", 2022, "Blue")
+car_manager.add_car("Honda", "Civic", 2021, "Red")
+
+sample_reviews = [
+    {
+        "author_name": "John Doe",
+        "product_name": "Toyota Camry",
+        "rating": 5,
+        "comment": "Great car!"
+    },
+    {
+        "author_name": "Jane Smith",
+        "product_name": "Honda Civic",
+        "rating": 4,
+        "comment": "Good fuel efficiency."
+    }
+]
+
+sample_enquiries = [
+    {
+        "sender_name": "Alice",
+        "receiver_name": "Bob",
+        "message": "Interested in the Toyota Camry."
+    },
+    {
+        "sender_name": "Charlie",
+        "receiver_name": "David",
+        "message": "Do you have financing options?"
+    }
+]
+
 @app.route('/', methods=['GET'])
 def home():
     return jsonify({"message": "Welcome to the Car Management System"})
@@ -54,14 +85,20 @@ def delete_car(index):
     return jsonify({"error": "Car not found"}), 404
 
 @app.route('/enquiries', methods=['POST'])
-def send_inquiry():
+def send_enquiry():
     data = request.get_json()
     sender_name = data.get("sender_name")
     receiver_name = data.get("receiver_name")
     message = data.get("message")
     
-    communication_system.send_inquiry(sender_name, receiver_name, message)
-    return jsonify({"message": "Inquiry sent successfully"}), 201
+    # Add the enquiry to the sample_enquiries list
+    sample_enquiries.append({
+        "sender_name": sender_name,
+        "receiver_name": receiver_name,
+        "message": message
+    })
+    
+    return jsonify({"message": "Enquiry sent successfully"}), 201
 
 @app.route('/reviews', methods=['POST'])
 def send_review():
@@ -73,6 +110,15 @@ def send_review():
     
     communication_system.send_review(author_name, product_name, rating, comment)
     return jsonify({"message": "Review submitted successfully"}), 201
+
+@app.route('/enquiries', methods=['GET'])
+def display_enquiries():
+    return jsonify(sample_enquiries)
+
+@app.route('/reviews', methods=['GET'])
+def display_reviews():
+    reviews = communication_system.get_reviews()
+    return jsonify(reviews)
 
 @app.route('/api/contact', methods=['GET'])
 def get_contact_info():
