@@ -1,7 +1,39 @@
 import React, { useEffect, useState } from 'react';
-import Navbar from '../assets/Navbar';
 import Slideshow from '../assets/Slideshow';
 import { Link } from 'react-router-dom';
+import { Container, Typography, Grid, Card, CardMedia, Button } from '@mui/material';
+import { styled } from '@mui/system';
+
+const WelcomeContainer = styled(Container)({
+  marginTop: '1rem',
+  textAlign: 'center',
+});
+
+const WelcomeText = styled(Typography)({
+  fontSize: '3rem',
+  fontWeight: 'bold',
+});
+
+const ExploreText = styled(Typography)({
+  fontSize: '1.5rem',
+  marginTop: '1rem',
+});
+
+const CardContainer = styled(Container)({
+  marginTop: '2rem',
+  display: 'flex',
+  flexDirection: 'row', // Display cards in a row
+  // overflowX: 'auto', // Allow horizontal scrolling if needed
+});
+
+const CardImage = styled(Card)({
+  width: '100%',
+  height: '30%',
+  objectFit: 'cover',
+  maxWidth: '150px', // Adjust the max width to reduce card size
+  margin: '5rem', // Add some margin between cards
+  objectPosition: 'absolute',
+});
 
 function Home() {
   const [brands, setBrands] = useState([]);
@@ -16,39 +48,28 @@ function Home() {
 
   return (
     <>
-    <Navbar />
-      <div className="container mt-4">
-        <div className="container mx-auto px-4">
-          <div className="mt-12">
-            <h2 className="text-3xl font-bold text-center">
-              Welcome to the Car Dealership App
-            </h2>
-            <p className="text-lg text-center mt-4">
-              Explore our wide range of cars for sale.
-            </p>
-          </div>
-        </div>
-      </div>
+      <WelcomeContainer maxWidth="md">
+        <WelcomeText>
+          Welcome to the Car Dealership App
+        </WelcomeText>
+        <ExploreText>
+          Explore our wide range of cars for sale.
+        </ExploreText>
+      </WelcomeContainer>
       <Slideshow />
-      <div className="container mt-4">
-        <h1>Brands</h1>
-        <div className="row row-cols-2 row-cols-md-8"> 
-          {brands.map((brand) => (
-            <div key={brand.id} className="col mb-4">
-              <div className="card" style={{ width: '100%', height: '100%' }}>
-                <Link to={`/${brand.name}/cars`} className="card">
-                  <img
-                    className="card-img-top"
-                    src={brand.image_url}
-                    alt={brand.name}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-                  />
-                </Link>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      <CardContainer>
+        {brands.map((brand) => (
+          <Card key={brand.id} style={{ flex: '0 0 auto' }}>
+            <Link to={`/${brand.name}/cars`} className="card">
+              <CardImage
+                component="img"
+                alt={brand.name}
+                src={brand.image_url}
+              />
+            </Link>
+          </Card>
+        ))}
+      </CardContainer>
     </>
   );
 }

@@ -1,77 +1,110 @@
+import React, { useState, useContext } from 'react';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import Container from '@mui/material/Container';
+import Grid from '@mui/material/Grid';
+import IconButton from '@mui/material/IconButton';
+import InputAdornment from '@mui/material/InputAdornment';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
+import axios from 'axios';
+import { AuthContext } from '../contexts/AuthContext'; // Import the AuthContext
 
-import React, { useContext, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { AuthContext } from '../contexts/AuthContext';
+function Login() {
+  const navigate = useNavigate();
+  const { login } = useContext(AuthContext); // Use the login function from AuthContext
+  const [formData, setFormData] = useState({
+    username: '',
+    password: '',
+    showPassword: false,
+  });
 
-export default function Login() {
-  const { login } = useContext(AuthContext);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
 
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const handleTogglePassword = () => {
+    setFormData({
+      ...formData,
+      showPassword: !formData.showPassword,
+    });
+  };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(username + '  ' + password);
-    login(username, password);
+
+    try {
+      // Use the login function from AuthContext
+      await login(formData.username, formData.password);
+
+      // If login is successful, navigate to the dashboard
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Error:', error.message);
+      Swal.fire('Error', 'Login failed', 'error');
+    }
   };
 
   return (
-    <div className="bg-gray-100 min-h-screen flex items-center justify-center">
-      <div className="bg-white rounded-lg shadow-md p-8 w-full max-w-md">
-        <h1 className="text-center text-3xl font-semibold text-primary mb-6">
-          Login
-        </h1>
+    <Container component="main" maxWidth="xs">
+      <div>
         <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label htmlFor="username" className="block text-gray-700">
-              Username
-            </label>
-            <input
-              type="text"
-              id="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="form-input mt-1 block w-full rounded-md border-gray-300"
-            />
-          </div>
-
-          <div className="mb-4">
-            <label htmlFor="password" className="block text-gray-700">
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="form-input mt-1 block w-full rounded-md border-gray-300"
-            />
-          </div>
-
-          <div className="mb-4">
-            <label className="inline-flex items-center">
-              <input type="checkbox" className="form-checkbox" />
-              <span className="ml-2">Remember me</span>
-            </label>
-          </div>
-
-          <div className="text-center">
-            <button
-              type="submit"
-              className="bg-primary text-white rounded-md px-4 py-2 hover:bg-primary-dark transition duration-300"
-            >
-              Login
-            </button>
-          </div>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Username"
+                name="username"
+                variant="outlined"
+                value={formData.username}
+                onChange={handleChange}
+                required
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Password"
+                name="password"
+                type={formData.showPassword ? 'text' : 'password'}
+                variant="outlined"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={handleTogglePassword}
+                        edge="end"
+                      >
+                        {formData.showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Grid>
+          </Grid>
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            color="primary"
+            sx={{ mt: 3, mb: 2 }}
+          >
+            Log In
+          </Button>
         </form>
-
-        <div className="mt-4 text-center">
-          Don't have an account?{' '}
-          <Link to="/Register" className="text-primary hover:underline">
-            Register
-          </Link>
-        </div>
       </div>
-    </div>
+    </Container>
   );
 }
+
+export default Login;

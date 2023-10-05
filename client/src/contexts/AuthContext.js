@@ -8,7 +8,6 @@ export default function AuthProvider({ children }) {
   const nav = useNavigate();
   const [current_user, setCurrentUser] = useState(null);
   const [onChange, setOnChange] = useState(true);
-  
 
   // Login
   const login = async (username, password) => {
@@ -22,7 +21,7 @@ export default function AuthProvider({ children }) {
       const data = await response.json();
 
       if (response.ok) {
-        setCurrentUser({ id: data.id, email: data.email });
+        setCurrentUser({ id: data.id, email: data.email, user_role: data.user_role }); // Include user role
         nav('/');
         Swal.fire('Success', 'Login successful', 'success');
         setOnChange(!onChange);
@@ -81,11 +80,15 @@ export default function AuthProvider({ children }) {
   };
 
   useEffect(() => {
-    fetch('http://127.0.0.1:5000/login')  
+    // Check if the user is already logged in
+    fetch('http://127.0.0.1:5000/user', {
+      method: 'GET',
+      credentials: 'include', // Include credentials for session-based authentication
+    })
       .then((res) => res.json())
       .then((data) => {
         if (data.id) {
-          setCurrentUser({ id: data.id, email: data.email });
+          setCurrentUser({ id: data.id, email: data.email, user_role: data.user_role }); // Include user role
         }
       });
   }, [onChange]);

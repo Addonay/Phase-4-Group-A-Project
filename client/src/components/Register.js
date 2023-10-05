@@ -1,104 +1,123 @@
-import React, { useContext, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { AuthContext } from '../contexts/AuthContext';
+import React, { useState } from 'react';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import Container from '@mui/material/Container';
+import Grid from '@mui/material/Grid';
+import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
+import axios from 'axios';
 
-export default function Register() {
-  const { register } = useContext(AuthContext);
+function Register() {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+    password: '',
+    profile_image: null,
+  });
 
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [profile_image, setProfileImage] = useState('');
-  const [password, setPassword] = useState('');
+  const handleChange = (e) => {
+    const { name, value, files } = e.target;
 
-  const handleSubmit = (e) => {
+    if (name === 'profile_image') {
+      setFormData({
+        ...formData,
+        [name]: files[0],
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(username + '  ' + password);
-    register(username, email, password, profile_image);
+
+    const formDataToSend = new FormData();
+    formDataToSend.append('username', formData.username);
+    formDataToSend.append('email', formData.email);
+    formDataToSend.append('password', formData.password);
+    formDataToSend.append('profile_image', formData.profile_image);
+
+    try {
+      const response = await axios.post('http://127.0.0.1:5000/register', formDataToSend);
+
+      if (response.status === 200) {
+        Swal.fire('Success', 'Registration successful', 'success');
+        navigate('/login');
+      } else {
+        Swal.fire('Error', response.data.error || 'Registration failed', 'error');
+      }
+    } catch (error) {
+      console.error('Error:', error.message);
+      Swal.fire('Error', 'Something went wrong', 'error');
+    }
   };
 
   return (
-    <div className="bg-gray-100 min-h-screen flex items-center justify-center">
-      <div className="bg-white rounded-lg shadow-md p-8 w-full max-w-md">
-        <h1 className="text-center text-3xl font-semibold text-primary mb-6">
-          Register
-        </h1>
+    <Container component="main" maxWidth="xs">
+      <div>
         <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label htmlFor="username" className="block text-gray-700">
-              Username
-            </label>
-            <input
-              type="text"
-              id="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="form-input mt-1 block w-full rounded-md border-gray-300"
-            />
-          </div>
-
-          <div className="mb-4">
-            <label htmlFor="email" className="block text-gray-700">
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="form-input mt-1 block w-full rounded-md border-gray-300"
-            />
-          </div>
-
-          <div className="mb-4">
-            <label htmlFor="password" className="block text-gray-700">
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="form-input mt-1 block w-full rounded-md border-gray-300"
-            />
-          </div>
-
-          <div className="mb-4">
-            <label htmlFor="profile_image" className="block text-gray-700">
-              Profile Image
-            </label>
-            <input
-              type="text"
-              id="profile_image"
-              value={profile_image}
-              onChange={(e) => setProfileImage(e.target.value)}
-              className="form-input mt-1 block w-full rounded-md border-gray-300"
-            />
-          </div>
-
-          <div className="mb-4">
-            <label className="inline-flex items-center">
-              <input type="checkbox" className="form-checkbox" />
-              <span className="ml-2">Remember me</span>
-            </label>
-          </div>
-
-          <div className="text-center">
-            <button
-              type="submit"
-              className="bg-primary text-white rounded-md px-4 py-2 hover:bg-primary-dark transition duration-300"
-            >
-              Register
-            </button>
-          </div>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Username"
+                name="username"
+                variant="outlined"
+                value={formData.username}
+                onChange={handleChange}
+                required
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Email"
+                name="email"
+                type="email"
+                variant="outlined"
+                value={formData.email}
+                onChange={handleChange}
+                required
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Password"
+                name="password"
+                type="password"
+                variant="outlined"
+                value={formData.password}
+                onChange={handleChange}
+                required
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <input
+                type="file"
+                accept="image/*"
+                name="profile_image"
+                onChange={handleChange}
+              />
+            </Grid>
+          </Grid>
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            color="primary"
+            sx={{ mt: 3, mb: 2 }}
+          >
+            Register
+          </Button>
         </form>
-
-        <div className="mt-4 text-center">
-          Already have an account?{' '}
-          <Link to="/Login" className="text-primary hover:underline">
-            Login
-          </Link>
-        </div>
       </div>
-    </div>
+    </Container>
   );
 }
+
+export default Register;

@@ -7,6 +7,7 @@ from flask_migrate import Migrate
 from forms import LoginForm, RegistrationForm
 from flask_login import LoginManager, logout_user, current_user, login_required
 from flask_session import Session  
+from flask_wtf.csrf import CSRFProtect
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -14,8 +15,8 @@ db.init_app(app)
 
 bcrypt = Bcrypt(app)
 
-CORS(app, support_credentials=True)
-
+CORS(app, origins=["http://localhost:3000"], methods=["GET", "POST"], supports_credentials=True)
+CSRFProtect(app)
 migrate = Migrate(app, db)
 Session(app)
 
@@ -37,6 +38,7 @@ def list_brands():
 
     return jsonify(brands=brand_list)
 
+
 @app.route("/register", methods=["POST"])
 def register():
     form = RegistrationForm(request.form)
@@ -51,9 +53,9 @@ def register():
         if user_exists:
             return jsonify({"error": "User already exists"}), 409
 
-        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')  # Hash the password
+        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')  
 
-        new_user = User(username=username, email=email, password=hashed_password)  # Use the hashed password
+        new_user = User(username=username, email=email, password=hashed_password)  
         db.session.add(new_user)
         db.session.commit()
 
@@ -102,6 +104,21 @@ def login_user():
     else:
         # Return validation errors
         return jsonify({"errors": form.errors}), 400
+    
+@app.route('/user', methods=['GET'])
+def get_user():
+    if current_user.is_authenticated:
+        # User is authenticated, return user data
+        user_data = {
+            'id': current_user.id,
+            'email': current_user.email,
+            'user_role': current_user.user_role  # Include the user role
+        }
+        return jsonify(user_data), 200
+    else:
+        # User is not authenticated, return an empty response
+        return jsonify({}), 401
+
 
 
 @app.route('/logout', methods=['POST'])
