@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from CarManagement import CarManagement
-from Enquiries import CommunicationSystem
+from CommunicationSystem import CommunicationSystem
 from Contacts import contact_info
 
 app = Flask(__name__)

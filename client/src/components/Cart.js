@@ -3,7 +3,7 @@ import './Cart.css';
 
 function Cart() {
   const [cart, setCart] = useState([]);
-  const cartStorageKey = 'cart'; 
+  const cartStorageKey = 'cart';
 
   useEffect(() => {
     const storedCart = JSON.parse(localStorage.getItem(cartStorageKey) || '[]');
@@ -25,6 +25,11 @@ function Cart() {
 
   const clearCart = () => {
     setCart([]);
+  };
+
+  const checkout = () => {
+    clearCart();
+    alert('Thank you for your purchase! Your order has been placed.');
   };
 
   const cartTotal = cart.reduce((total, item) => total + item.price, 0);
@@ -66,6 +71,7 @@ function Cart() {
         {cart.length > 0 && (
           <div>
             <button onClick={clearCart}>Clear Cart</button>
+            <button onClick={checkout}>Checkout</button>
             <p>Total: ${cartTotal}</p>
           </div>
         )}

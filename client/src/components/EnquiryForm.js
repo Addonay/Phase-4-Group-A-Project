@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import './EnquiryForm.css';
+
 
 const EnquiryForm = () => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const [senderName, setSenderName] = useState('');
+  const [receiverName, setReceiverName] = useState('');
   const [message, setMessage] = useState('');
 
   const handleSubmit = async (e) => {
@@ -14,10 +16,10 @@ const EnquiryForm = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name, email, message }),
+        body: JSON.stringify({ senderName, receiverName, message }),
       });
 
-      if (response.status === 200) {
+      if (response.status === 201) {
         alert('Enquiry submitted successfully');
       } else {
         alert('Enquiry submission failed');
@@ -30,20 +32,20 @@ const EnquiryForm = () => {
   return (
     <form onSubmit={handleSubmit}>
       <div>
-        <label>Name:</label>
+        <label>Sender's Name:</label>
         <input
           type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          value={senderName}
+          onChange={(e) => setSenderName(e.target.value)}
           required
         />
       </div>
       <div>
-        <label>Email:</label>
+        <label>Receiver's Name:</label>
         <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          type="text"
+          value={receiverName}
+          onChange={(e) => setReceiverName(e.target.value)}
           required
         />
       </div>
