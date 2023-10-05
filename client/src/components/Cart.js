@@ -1,7 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 function Cart() {
   const [cart, setCart] = useState([]);
+  const cartStorageKey = 'cart'; 
+
+  useEffect(() => {
+    const storedCart = JSON.parse(localStorage.getItem(cartStorageKey) || '[]');
+    setCart(storedCart);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem(cartStorageKey, JSON.stringify(cart));
+  }, [cart]);
 
   const addToCart = (item) => {
     setCart([...cart, item]);
@@ -10,6 +20,10 @@ function Cart() {
   const removeFromCart = (itemId) => {
     const updatedCart = cart.filter((item) => item.id !== itemId);
     setCart(updatedCart);
+  };
+
+  const clearCart = () => {
+    setCart([]);
   };
 
   const cartTotal = cart.reduce((total, item) => total + item.price, 0);
@@ -36,15 +50,24 @@ function Cart() {
       </div>
       <div className="cart">
         <h2>Cart</h2>
-        <ul>
-          {cart.map((item) => (
-            <li key={item.id}>
-              {item.name} - ${item.price}
-              <button onClick={() => removeFromCart(item.id)}>Remove</button>
-            </li>
-          ))}
-        </ul>
-        <p>Total: ${cartTotal}</p>
+        {cart.length === 0 ? (
+          <p>Your cart is empty.</p>
+        ) : (
+          <ul>
+            {cart.map((item) => (
+              <li key={item.id}>
+                {item.name} - ${item.price}
+                <button onClick={() => removeFromCart(item.id)}>Remove</button>
+              </li>
+            ))}
+          </ul>
+        )}
+        {cart.length > 0 && (
+          <div>
+            <button onClick={clearCart}>Clear Cart</button>
+            <p>Total: ${cartTotal}</p>
+          </div>
+        )}
       </div>
     </div>
   );

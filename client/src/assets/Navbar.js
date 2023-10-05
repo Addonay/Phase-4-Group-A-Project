@@ -7,8 +7,8 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'; // Import the cart icon
 import useMediaQuery from '@mui/material/useMediaQuery';
-import Cart from '../components/Cart'; 
 
 function Navbar() {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -52,6 +52,14 @@ function Navbar() {
         >
           <MenuIcon />
         </IconButton>
+        <IconButton
+          color="inherit"
+          aria-label="cart"
+          component={Link}
+          to="/cart"
+        >
+          <ShoppingCartIcon />
+        </IconButton>
       </Toolbar>
 
       <Menu
@@ -63,9 +71,6 @@ function Navbar() {
           <Link to="/" style={{ textDecoration: 'none', color: 'black' }}>
             Home
           </Link>
-        </MenuItem>
-        <MenuItem onClick={handleMenuClose}>
-          <Cart />
         </MenuItem>
       </Menu>
     </AppBar>
