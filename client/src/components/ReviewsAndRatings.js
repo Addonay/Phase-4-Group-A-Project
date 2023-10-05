@@ -13,7 +13,7 @@ function ReviewsAndRatings() {
   };
 
   const handleSubmit = () => {
-    // Frontend validation (e.g., rating between 1-5, non-empty comment)
+    // Frontend validation 
     if (rating >= 1 && rating <= 5 && comment.trim() !== '') {
       // Simulate sending review data to the backend via API
       fetch('/submit-review', {

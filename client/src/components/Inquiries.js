@@ -18,7 +18,7 @@ function InquiryForm() {
   };
 
   const handleSubmit = () => {
-    // Frontend validation (e.g., non-empty name, valid email, non-empty message)
+    // Frontend validation 
     if (name.trim() !== '' && isValidEmail(email) && message.trim() !== '') {
       // Send inquiry data to the backend via API
       // Handle success or error response from the backend
@@ -28,7 +28,7 @@ function InquiryForm() {
   };
 
   const isValidEmail = (email) => {
-    // Implement email validation logic (e.g., using a regular expression)
+    // Implement email validation logic 
     return email.includes('@') && email.includes('.');
   };
 
