@@ -46,7 +46,7 @@ function Navbar() {
                 Login
               </Typography>
             </Link>
-            <Link to="/userdashboard" style={{ textDecoration: 'none', color: 'white' }}>
+            <Link to="/userprofile" style={{ textDecoration: 'none', color: 'white' }}>
               <Typography variant="h6" component="div" sx={{ mr: 2 }}>
                 Profile
               </Typography>
@@ -80,7 +80,7 @@ function Navbar() {
           </Link>
         </MenuItem>
         <MenuItem onClick={handleMenuClose}>
-          <Link to="/userdashboard" style={{ textDecoration: 'none', color: 'black' }}>
+          <Link to="/userprofile" style={{ textDecoration: 'none', color: 'black' }}>
             Profile
           </Link>
         </MenuItem>

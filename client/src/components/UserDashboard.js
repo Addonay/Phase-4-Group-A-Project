@@ -1,192 +1,76 @@
-// import React from 'react';
-// import Container from '@mui/material/Container';
-// import Grid from '@mui/material/Grid';
-// import Paper from '@mui/material/Paper';
-// import Typography from '@mui/material/Typography';
-// import Button from '@mui/material/Button';
+import React, { useContext, useCallback } from 'react';
+import { Link } from 'react-router-dom';
+import { AuthContext } from '../contexts/AuthContext';
+import { useDropzone } from 'react-dropzone';
 
-// function UserDashboard() {
-//   return (
-//     <section style={{ backgroundColor: '#eee' }}>
-//       <Container sx={{ py: 5 }}>
-//         <Grid container spacing={3}>
-//           <Grid item xs={12}>
-//             <nav aria-label="breadcrumb" className="bg-light rounded-3 p-3 mb-4">
-//               <ol className="breadcrumb mb-0">
-//                 <li className="breadcrumb-item"><a href="#">Home</a></li>
-//                 <li className="breadcrumb-item"><a href="#">User</a></li>
-//                 <li className="breadcrumb-item active" aria-current="page">User Profile</li>
-//               </ol>
-//             </nav>
-//           </Grid>
-//         </Grid>
+export default function UserProfile() {
+  const { current_user } = useContext(AuthContext);
 
-//         <Grid container spacing={3}>
-//           <Grid item xs={12} lg={4}>
-//             <Paper sx={{ p: 2 }}>
-//               <div className="card-body text-center">
-//                 <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3.webp" alt="avatar"
-//                   className="rounded-circle img-fluid" style={{ width: '150px' }} />
-//                 <Typography variant="h5" sx={{ mt: 3, mb: 2 }}>John Smith</Typography>
-//                 <Typography variant="body1" color="textSecondary" sx={{ mb: 1 }}>Full Stack Developer</Typography>
-//                 <Typography variant="body1" color="textSecondary" sx={{ mb: 4 }}>Bay Area, San Francisco, CA</Typography>
-//                 <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '2px' }}>
-//                   <Button variant="contained" color="primary" sx={{ marginRight: '8px' }}>Follow</Button>
-//                   <Button variant="outlined" color="primary">Message</Button>
-//                 </div>
-//               </div>
-//             </Paper>
-//             <Paper sx={{ p: 2 }}>
-//               <div className="card-body p-0">
-//                 <ul className="list-group list-group-flush rounded-3">
-//                   <li className="list-group-item d-flex justify-content-between align-items-center p-3">
-//                     <i className="fas fa-globe fa-lg text-warning"></i>
-//                     <Typography variant="body2">https://mdbootstrap.com</Typography>
-//                   </li>
-//                   <li className="list-group-item d-flex justify-content-between align-items-center p-3">
-//                     <i className="fab fa-github fa-lg" style={{ color: '#333333' }}></i>
-//                     <Typography variant="body2">mdbootstrap</Typography>
-//                   </li>
-//                   <li className="list-group-item d-flex justify-content-between align-items-center p-3">
-//                     <i className="fab fa-twitter fa-lg" style={{ color: '#55acee' }}></i>
-//                     <Typography variant="body2">@mdbootstrap</Typography>
-//                   </li>
-//                   <li className="list-group-item d-flex justify-content-between align-items-center p-3">
-//                     <i className="fab fa-instagram fa-lg" style={{ color: '#ac2bac' }}></i>
-//                     <Typography variant="body2">mdbootstrap</Typography>
-//                   </li>
-//                   <li className="list-group-item d-flex justify-content-between align-items-center p-3">
-//                     <i className="fab fa-facebook-f fa-lg" style={{ color: '#3b5998' }}></i>
-//                     <Typography variant="body2">mdbootstrap</Typography>
-//                   </li>
-//                 </ul>
-//               </div>
-//             </Paper>
-//           </Grid>
-//           <Grid item xs={12} lg={8}>
-//             <Paper sx={{ p: 2 }}>
-//               <div className="card-body">
-//                 <div className="row">
-//                   <div className="col-sm-3">
-//                     <Typography variant="body1">Full Name</Typography>
-//                   </div>
-//                   <div className="col-sm-9">
-//                     <Typography variant="body2" color="textSecondary">Johnatan Smith</Typography>
-//                   </div>
-//                 </div>
-//                 <hr />
-//                 <div className="row">
-//                   <div className="col-sm-3">
-//                     <Typography variant="body1">Email</Typography>
-//                   </div>
-//                   <div className="col-sm-9">
-//                     <Typography variant="body2" color="textSecondary">example@example.com</Typography>
-//                   </div>
-//                 </div>
-//                 <hr />
-//                 <div className="row">
-//                   <div className="col-sm-3">
-//                     <Typography variant="body1">Phone</Typography>
-//                   </div>
-//                   <div className="col-sm-9">
-//                     <Typography variant="body2" color="textSecondary">(097) 234-5678</Typography>
-//                   </div>
-//                 </div>
-//                 <hr />
-//                 <div className="row">
-//                   <div className="col-sm-3">
-//                     <Typography variant="body1">Mobile</Typography>
-//                   </div>
-//                   <div className="col-sm-9">
-//                     <Typography variant="body2" color="textSecondary">(098) 765-4321</Typography>
-//                   </div>
-//                 </div>
-//                 <hr />
-//                 <div className="row">
-//                   <div className="col-sm-3">
-//                     <Typography variant="body1">Address</Typography>
-//                   </div>
-//                   <div className="col-sm-9">
-//                     <Typography variant="body2" color="textSecondary">Bay Area, San Francisco, CA</Typography>
-//                   </div>
-//                 </div>
-//               </div>
-//             </Paper>
-//             <div className="row">
-//               <div className="col-md-6">
-//                 <Paper sx={{ p: 2 }}>
-//                   <div className="card-body">
-//                     <Typography variant="body1" sx={{ mb: 4 }}>
-//                       <span className="text-primary font-italic me-1">assigment</span> Project Status
-//                     </Typography>
-//                     <Typography variant="body2" sx={{ mb: 1, fontSize: '.77rem' }}>Web Design</Typography>
-//                     <div className="progress rounded" style={{ height: '5px' }}>
-//                       <div className="progress-bar" role="progressbar" style={{ width: '80%' }} aria-valuenow="80"
-//                         aria-valuemin="0" aria-valuemax="100"></div>
-//                     </div>
-//                     <Typography variant="body2" sx={{ mt: 4, mb: 1, fontSize: '.77rem' }}>Website Markup</Typography>
-//                     <div className="progress rounded" style={{ height: '5px' }}>
-//                       <div className="progress-bar" role="progressbar" style={{ width: '72%' }} aria-valuenow="72"
-//                         aria-valuemin="0" aria-valuemax="100"></div>
-//                     </div>
-//                     <Typography variant="body2" sx={{ mt: 4, mb: 1, fontSize: '.77rem' }}>One Page</Typography>
-//                     <div className="progress rounded" style={{ height: '5px' }}>
-//                       <div className="progress-bar" role="progressbar" style={{ width: '89%' }} aria-valuenow="89"
-//                         aria-valuemin="0" aria-valuemax="100"></div>
-//                     </div>
-//                     <Typography variant="body2" sx={{ mt: 4, mb: 1, fontSize: '.77rem' }}>Mobile Template</Typography>
-//                     <div className="progress rounded" style={{ height: '5px' }}>
-//                       <div className="progress-bar" role="progressbar" style={{ width: '55%' }} aria-valuenow="55"
-//                         aria-valuemin="0" aria-valuemax="100"></div>
-//                     </div>
-//                     <Typography variant="body2" sx={{ mt: 4, mb: 1, fontSize: '.77rem' }}>Backend API</Typography>
-//                     <div className="progress rounded mb-2" style={{ height: '5px' }}>
-//                       <div className="progress-bar" role="progressbar" style={{ width: '66%' }} aria-valuenow="66"
-//                         aria-valuemin="0" aria-valuemax="100"></div>
-//                     </div>
-//                   </div>
-//                 </Paper>
-//               </div>
-//               <div className="col-md-6">
-//                 <Paper sx={{ p: 2 }}>
-//                   <div className="card-body">
-//                     <Typography variant="body1" sx={{ mb: 4 }}>
-//                       <span className="text-primary font-italic me-1">assigment</span> Project Status
-//                     </Typography>
-//                     <Typography variant="body2" sx={{ mb: 1, fontSize: '.77rem' }}>Web Design</Typography>
-//                     <div className="progress rounded" style={{ height: '5px' }}>
-//                       <div className="progress-bar" role="progressbar" style={{ width: '80%' }} aria-valuenow="80"
-//                         aria-valuemin="0" aria-valuemax="100"></div>
-//                     </div>
-//                     <Typography variant="body2" sx={{ mt: 4, mb: 1, fontSize: '.77rem' }}>Website Markup</Typography>
-//                     <div className="progress rounded" style={{ height: '5px' }}>
-//                       <div className="progress-bar" role="progressbar" style={{ width: '72%' }} aria-valuenow="72"
-//                         aria-valuemin="0" aria-valuemax="100"></div>
-//                     </div>
-//                     <Typography variant="body2" sx={{ mt: 4, mb: 1, fontSize: '.77rem' }}>One Page</Typography>
-//                     <div className="progress rounded" style={{ height: '5px' }}>
-//                       <div className="progress-bar" role="progressbar" style={{ width: '89%' }} aria-valuenow="89"
-//                         aria-valuemin="0" aria-valuemax="100"></div>
-//                     </div>
-//                     <Typography variant="body2" sx={{ mt: 4, mb: 1, fontSize: '.77rem' }}>Mobile Template</Typography>
-//                     <div className="progress rounded" style={{ height: '5px' }}>
-//                       <div className="progress-bar" role="progressbar" style={{ width: '55%' }} aria-valuenow="55"
-//                         aria-valuemin="0" aria-valuemax="100"></div>
-//                     </div>
-//                     <Typography variant="body2" sx={{ mt: 4, mb: 1, fontSize: '.77rem' }}>Backend API</Typography>
-//                     <div className="progress rounded mb-2" style={{ height: '5px' }}>
-//                       <div className="progress-bar" role="progressbar" style={{ width: '66%' }} aria-valuenow="66"
-//                         aria-valuemin="0" aria-valuemax="100"></div>
-//                     </div>
-//                   </div>
-//                 </Paper>
-//               </div>
-//             </div>
-//           </Grid>
-//         </Grid>
-//       </Container>
-//     </section>
-//   );
-// }
+  const handleFileUpload = useCallback((acceptedFiles) => {
+    // Handle the uploaded file here
+    console.log('Uploaded file:', acceptedFiles[0]);
 
-// export default UserDashboard;
+    // You can send the file to your backend for storage and update the user's profile image
+  }, []);
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop: handleFileUpload, // Call the function to handle file uploads
+    accept: 'image/*', // Specify that only image files are allowed
+  });
+
+  return (
+    <div className="max-w-md mx-auto p-4 bg-white shadow-md rounded-lg">
+      <h1 className="text-3xl font-semibold mb-4">User Profile</h1>
+
+      <div className="mb-4">
+        <div
+          {...getRootProps()}
+          className={`w-32 h-32 mx-auto bg-gray-200 rounded-full border-2 ${
+            isDragActive ? 'border-blue-500' : 'border-gray-300'
+          } flex items-center justify-center cursor-pointer`}
+        >
+          <input {...getInputProps()} />
+          {isDragActive ? (
+            <p className="text-blue-500">Drop your profile picture here</p>
+          ) : (
+            <p className="text-gray-500">Drag 'n' drop your profile picture here, or click to select one</p>
+          )}
+        </div>
+      </div>
+
+      <div className="mb-4">
+        <p className="text-lg">
+          <span className="font-semibold">Username:</span> {current_user.username}
+        </p>
+        <p className="text-lg">
+          <span className="font-semibold">Email:</span> {current_user.email}
+        </p>
+        <p className="text-lg">
+          <span className="font-semibold">Address:</span> {current_user.address}
+        </p>
+        {/* Add more user information here */}
+      </div>
+
+      {/* Cart and Purchase History Cards */}
+      <div className="flex justify-center space-x-4">
+        <Link to="/cart" className="flex items-center justify-center w-1/2 bg-blue-500 hover:bg-blue-600 text-white p-4 rounded-lg">
+          <div className="flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16l-4-4m0 0l4-4m-4 4h18"></path>
+            </svg>
+          </div>
+          <span className="ml-2">View Cart</span>
+        </Link>
+
+        <Link to="/purchase-history" className="flex items-center justify-center w-1/2 bg-green-500 hover:bg-green-600 text-white p-4 rounded-lg">
+          <div className="flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+          </div>
+          <span className="ml-2">Purchase History</span>
+        </Link>
+      </div>
+    </div>
+  );
+}

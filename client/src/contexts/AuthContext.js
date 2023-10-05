@@ -8,6 +8,7 @@ export default function AuthProvider({ children }) {
   const nav = useNavigate();
   const [current_user, setCurrentUser] = useState(null);
   const [onChange, setOnChange] = useState(true);
+  
 
   // Login
   const login = async (username, password) => {
@@ -80,7 +81,7 @@ export default function AuthProvider({ children }) {
   };
 
   useEffect(() => {
-    fetch('/login')  
+    fetch('http://127.0.0.1:5000/login')  
       .then((res) => res.json())
       .then((data) => {
         if (data.id) {
