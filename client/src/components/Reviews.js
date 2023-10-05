@@ -13,10 +13,11 @@ function Reviews() {
       .catch(error => {
         console.error('Error:', error);
       });
-  }, []);
+  }, []); 
 
   const handleReviewSubmit = (e) => {
     e.preventDefault();
+    
     axios.post('/reviews', { text: newReview })
       .then(response => {
         alert(response.data.message);
@@ -55,7 +56,9 @@ function Reviews() {
       <h2>Existing Reviews:</h2>
       <ul>
         {reviews.map((review, index) => (
-          <li key={index}>{review.text}</li>
+          <li key={index}>
+            <strong>{review.author}:</strong> {review.content} (Rating: {review.rating})
+          </li>
         ))}
       </ul>
     </div>

@@ -1,6 +1,6 @@
-import React from "react";
-import Navbar from "../assets/Navbar";
-import Footer from "../assets/Footer";
+import React from 'react';
+import Navbar from '../assets/Navbar.js'; 
+import Footer from '../assets/Footer.js';
 
 function Home() {
   return (
@@ -17,7 +17,7 @@ function Home() {
           {/* Add your car listings or other content here */}
         </div>
       </div>
-      <Footer/>
+      <Footer />
     </div>
   );
 }

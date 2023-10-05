@@ -1,76 +1,62 @@
-from flask import Flask, request, jsonify
-from models import db
-from flask_migrate import Migrate
-from flask_cors import CORS
-from models import Car
+class Car:
+    def __init__(self, make, model, year, color):
+        self.make = make
+        self.model = model
+        self.year = year
+        self.color = color
 
-app = Flask(__name__)
-CORS(app)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///car_showroom.db'
+    def __str__(self):
+        return f"{self.year} {self.make} {self.model} ({self.color})"
 
-db.init_app(app)
 
-migrate = Migrate(app, db)
+class CarManagement:
+    def __init__(self):
+        self.cars = []
 
-with app.app_context():
-    db.create_all()
+    def add_car(self, make, model, year, color):
+        car = Car(make, model, year, color)
+        self.cars.append(car)
 
-@app.route('/api/cars', methods=['GET'])
-def list_cars():
-    cars = Car.query.all()
-    car_list = []
-    for car in cars:
-        car_list.append({
-            'id': car.id,
-            'make': car.make,
-            'model': car.model,
-            'year': car.year,
-            'price': car.price
-        })
-    return jsonify(car_list)
+    def get_car_by_index(self, index):
+        if 0 <= index < len(self.cars):
+            return self.cars[index]
+        return None
 
-@app.route('/api/cars', methods=['POST'])
-def add_car():
-    data = request.get_json()
-    make = data['make']
-    model = data['model']
-    year = data['year']
-    price = data['price']
+    def get_all_cars(self):
+        return self.cars
 
-    new_car = Car(make=make, model=model, year=year, price=price)
-    db.session.add(new_car)
-    db.session.commit()
+    def update_car(self, index, make, model, year, color):
+        if 0 <= index < len(self.cars):
+            self.cars[index].make = make
+            self.cars[index].model = model
+            self.cars[index].year = year
+            self.cars[index].color = color
+            return True
+        return False
 
-    return jsonify({'message': 'Car added successfully'})
+    def delete_car(self, index):
+        if 0 <= index < len(self.cars):
+            del self.cars[index]
+            return True
+        return False
 
-@app.route('/api/cars/update/<int:id>', methods=['PUT'])
-def update_car(id):
-    data = request.get_json()
-    car = Car.query.get(id)
 
-    if not car:
-        return jsonify({'error': 'Car not found'}), 404
+if __name__ == "__main__":
+    car_manager = CarManagement()
 
-    car.make = data['make']
-    car.model = data['model']
-    car.year = data['year']
-    car.price = data['price']
+    car_manager.add_car("Toyota", "Camry", 2022, "Blue")
+    car_manager.add_car("Honda", "Civic", 2021, "Red")
 
-    db.session.commit()
+    print("List of Cars:")
+    for index, car in enumerate(car_manager.get_all_cars()):
+        print(f"{index + 1}. {car}")
 
-    return jsonify({'message': 'Car updated successfully'})
+    if car_manager.update_car(0, "Toyota", "Corolla", 2022, "Silver"):
+        print("Car updated successfully")
 
-@app.route('/api/cars/delete/<int:id>', methods=['DELETE'])
-def delete_car(id):
-    car = Car.query.get(id)
+    if car_manager.delete_car(1):
+        print("Car deleted successfully")
 
-    if not car:
-        return jsonify({'error': 'Car not found'}), 404
-
-    db.session.delete(car)
-    db.session.commit()
-
-    return jsonify({'message': 'Car deleted successfully'})
-
-if __name__ == '__main__':
-    app.run(port=5000)
+    print("\nUpdated List of Cars:")
+    for index, car in enumerate(car_manager.get_all_cars()):
+        print(f"{index + 1}. {car}")

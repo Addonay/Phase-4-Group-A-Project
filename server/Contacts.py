@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask
 
 app = Flask(__name__)
 
@@ -14,9 +14,4 @@ contact_info = {
     },
 }
 
-@app.route('/api/contact', methods=['GET'])
-def get_contact_info():
-    return jsonify(contact_info)
 
-if __name__ == '__main__':
-    app.run(debug=True)
