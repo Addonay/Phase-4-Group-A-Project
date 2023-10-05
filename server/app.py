@@ -91,7 +91,6 @@ def send_enquiry():
     receiver_name = data.get("receiver_name")
     message = data.get("message")
     
-    # Add the enquiry to the sample_enquiries list
     sample_enquiries.append({
         "sender_name": sender_name,
         "receiver_name": receiver_name,
@@ -113,12 +112,14 @@ def send_review():
 
 @app.route('/enquiries', methods=['GET'])
 def display_enquiries():
-    return jsonify(sample_enquiries)
+    all_enquiries = sample_enquiries + communication_system.get_enquiries()
+    return jsonify(all_enquiries)
 
 @app.route('/reviews', methods=['GET'])
 def display_reviews():
-    reviews = communication_system.get_reviews()
-    return jsonify(reviews)
+    all_reviews = sample_reviews + communication_system.get_reviews()
+    return jsonify(all_reviews)
+
 
 @app.route('/api/contact', methods=['GET'])
 def get_contact_info():
