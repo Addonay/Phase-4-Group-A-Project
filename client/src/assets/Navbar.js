@@ -7,7 +7,7 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import useMediaQuery from '@mui/material/useMediaQuery'; // Import useMediaQuery
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 function Navbar() {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -20,25 +20,39 @@ function Navbar() {
     setAnchorEl(null);
   };
 
-  const isMobile = useMediaQuery('(max-width:800px)'); // Check if the screen size is mobile
+  const isMobile = useMediaQuery('(max-width:800px)');
 
   return (
     <AppBar position="static">
-      <Toolbar sx={{ display: 'flex',  }}>
-      <img
+      <Toolbar sx={{ display: 'flex' }}>
+        <img
           src="\logo512.png"
           alt="Your Logo"
-          style={{ width: '45px', height: 'auto' }} // Adjust the width and height as needed
+          style={{ width: '45px', height: 'auto' }}
         />
         <Typography variant="h4" component="div" sx={{ flexGrow: 1 }} style={{ textDecoration: 'none', color: 'orange' }}>
-          ars
+          Car Dealership App
         </Typography>
-        {/* Conditionally render links based on the screen size */}
         {!isMobile && (
           <>
-            <Link to="/" style={{ textDecoration: 'none', color: 'white' }}>
+            <Link to="/reviews" style={{ textDecoration: 'none', color: 'white' }}>
               <Typography variant="h6" component="div" sx={{ mr: 2 }}>
-                Home
+                Reviews
+              </Typography>
+            </Link>
+            <Link to="/ratings" style={{ textDecoration: 'none', color: 'white' }}>
+              <Typography variant="h6" component="div" sx={{ mr: 2 }}>
+                Ratings
+              </Typography>
+            </Link>
+            <Link to="/inquiries" style={{ textDecoration: 'none', color: 'white' }}>
+              <Typography variant="h6" component="div" sx={{ mr: 2 }}>
+                Inquiries
+              </Typography>
+            </Link>
+            <Link to="/notifications" style={{ textDecoration: 'none', color: 'white' }}>
+              <Typography variant="h6" component="div" sx={{ mr: 2 }}>
+                Notifications
               </Typography>
             </Link>
           </>
@@ -53,15 +67,29 @@ function Navbar() {
           <MenuIcon />
         </IconButton>
       </Toolbar>
-
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={handleMenuClose}
       >
         <MenuItem onClick={handleMenuClose}>
-          <Link to="/" style={{ textDecoration: 'none', color: 'black' }}>
-            Home
+          <Link to="/reviews" style={{ textDecoration: 'none', color: 'black' }}>
+            Reviews
+          </Link>
+        </MenuItem>
+        <MenuItem onClick={handleMenuClose}>
+          <Link to="/ratings" style={{ textDecoration: 'none', color: 'black' }}>
+            Ratings
+          </Link>
+        </MenuItem>
+        <MenuItem onClick={handleMenuClose}>
+          <Link to="/inquiries" style={{ textDecoration: 'none', color: 'black' }}>
+            Inquiries
+          </Link>
+        </MenuItem>
+        <MenuItem onClick={handleMenuClose}>
+          <Link to="/notifications" style={{ textDecoration: 'none', color: 'black' }}>
+            Notifications
           </Link>
         </MenuItem>
       </Menu>
