@@ -3,6 +3,7 @@ import Slideshow from '../assets/Slideshow';
 import { Link } from 'react-router-dom';
 import { Container, Typography, Grid, Card, CardMedia, Button } from '@mui/material';
 import { styled } from '@mui/system';
+import Navbar from "../assets/Navbar";
 
 const WelcomeContainer = styled(Container)({
   marginTop: '1rem',
@@ -23,7 +24,7 @@ const CardContainer = styled(Container)({
   marginTop: '2rem',
   display: 'flex',
   flexDirection: 'row', // Display cards in a row
-  // overflowX: 'auto', // Allow horizontal scrolling if needed
+  overflowX: 'auto', // Allow horizontal scrolling if needed
 });
 
 const CardImage = styled(Card)({
@@ -48,6 +49,7 @@ function Home() {
 
   return (
     <>
+    <Navbar />
       <WelcomeContainer maxWidth="md">
         <WelcomeText>
           Welcome to the Car Dealership App

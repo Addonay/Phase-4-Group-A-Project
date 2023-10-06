@@ -7,10 +7,9 @@ import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import axios from 'axios';
 import { AuthContext } from '../contexts/AuthContext'; // Import the AuthContext
+import { Link, useNavigate } from 'react-router-dom'; // Import Link and useNavigate
 
 function Login() {
   const navigate = useNavigate();
@@ -44,7 +43,7 @@ function Login() {
       await login(formData.username, formData.password);
 
       // If login is successful, navigate to the dashboard
-      navigate('/dashboard');
+      navigate('/userprofile');
     } catch (error) {
       console.error('Error:', error.message);
       Swal.fire('Error', 'Login failed', 'error');
@@ -101,6 +100,8 @@ function Login() {
           >
             Log In
           </Button>
+          {/* Add a link to the registration page */}
+          <Link to="/register">Don't have an account? Register</Link>
         </form>
       </div>
     </Container>

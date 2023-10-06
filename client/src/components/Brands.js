@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { AuthContext } from '../contexts/AuthContext'; 
+import Rate from "../assets/Rate";
 
 function BrandShowcase() {
   const { brandName } = useParams();
   const [cars, setCars] = useState([]);
-  const userIsLoggedIn = true; // Set this to true if the user is logged in, or false if not
+  const { current_user } = useContext(AuthContext);
 
   useEffect(() => {
     // Fetch cars by brandName from your API
@@ -31,17 +33,17 @@ function BrandShowcase() {
                 <p className="card-text">Year: {car.year}</p>
                 <p className="card-text">Price: ${car.price}</p>
                 {car.description && <p className="card-text">{car.description}</p>}
-                
+                <Rate/>
                 {/* Conditional rendering based on user authentication */}
-                {userIsLoggedIn ? (
-                  <Link to="/cart">
-                    <button className="btn btn-primary">Add to Cart</button>
-                  </Link>
-                ) : (
-                  <Link to="/login">
-                    <button className="btn btn-secondary">Login to Add</button>
-                  </Link>
-                )}
+                {current_user ? (
+                <Link to={`/${current_user.username}/cart`}>
+                  <button className="btn btn-primary">Add to Cart</button>
+                </Link>
+              ) : (
+                <Link to="/login">
+                  <button className="btn btn-secondary">Login to Add to Cart</button>
+                </Link>
+              )}
               </div>
             </div>
           </div>

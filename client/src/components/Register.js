@@ -1,19 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
-import { useNavigate } from 'react-router-dom';
+import IconButton from '@mui/material/IconButton';
+import InputAdornment from '@mui/material/InputAdornment';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import { useNavigate, Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import axios from 'axios';
+import { AuthContext } from '../contexts/AuthContext';
 
 function Register() {
   const navigate = useNavigate();
+  const { register } = useContext(AuthContext);
+
   const [formData, setFormData] = useState({
     username: '',
     email: '',
     password: '',
     profile_image: null,
+    showPassword: false,
   });
 
   const handleChange = (e) => {
@@ -32,27 +39,25 @@ function Register() {
     }
   };
 
+  const handleTogglePassword = () => {
+    setFormData({
+      ...formData,
+      showPassword: !formData.showPassword,
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const formDataToSend = new FormData();
-    formDataToSend.append('username', formData.username);
-    formDataToSend.append('email', formData.email);
-    formDataToSend.append('password', formData.password);
-    formDataToSend.append('profile_image', formData.profile_image);
-
     try {
-      const response = await axios.post('http://127.0.0.1:5000/register', formDataToSend);
+      // Use the register function from AuthContext
+      await register(formData.username, formData.email, formData.password, formData.profile_image);
 
-      if (response.status === 200) {
-        Swal.fire('Success', 'Registration successful', 'success');
-        navigate('/login');
-      } else {
-        Swal.fire('Error', response.data.error || 'Registration failed', 'error');
-      }
+      Swal.fire('Success', 'Registration successful', 'success');
+      navigate('/login');
     } catch (error) {
       console.error('Error:', error.message);
-      Swal.fire('Error', 'Something went wrong', 'error');
+      Swal.fire('Error', 'Registration failed', 'error');
     }
   };
 
@@ -89,11 +94,23 @@ function Register() {
                 fullWidth
                 label="Password"
                 name="password"
-                type="password"
+                type={formData.showPassword ? 'text' : 'password'}
                 variant="outlined"
                 value={formData.password}
                 onChange={handleChange}
                 required
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={handleTogglePassword}
+                        edge="end"
+                      >
+                        {formData.showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
             </Grid>
             <Grid item xs={12}>
@@ -114,6 +131,7 @@ function Register() {
           >
             Register
           </Button>
+          <Link to="/login">Already have an account? Log in</Link>
         </form>
       </div>
     </Container>
