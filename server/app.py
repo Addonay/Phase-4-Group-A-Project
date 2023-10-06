@@ -5,7 +5,7 @@ from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from flask_migrate import Migrate
 from forms import LoginForm, RegistrationForm
-from flask_login import LoginManager, logout_user, current_user, login_required
+from flask_login import LoginManager, logout_user,login_user, current_user, login_required
 from flask_session import Session  
 from flask_wtf.csrf import CSRFProtect
 
@@ -15,7 +15,7 @@ db.init_app(app)
 
 bcrypt = Bcrypt(app)
 
-CORS(app, origins=["http://localhost:3000"], methods=["GET", "POST"], supports_credentials=True)
+CORS(app, supports_credentials=True)
 CSRFProtect(app)
 migrate = Migrate(app, db)
 Session(app)
@@ -41,24 +41,38 @@ def list_brands():
 
 @app.route("/register", methods=["POST"])
 def register():
-    form = RegistrationForm(request.form)
+    # Parse JSON data from the request
+    data = request.get_json()
+
+    # Create an instance of the RegistrationForm and populate it with the JSON data
+    form = RegistrationForm(**data)
 
     if form.validate():
         username = form.username.data
         email = form.email.data
         password = form.password.data
 
-        user_exists = User.query.filter_by(username=username).first() is not None
+        # Check if the user already exists
+        existing_user = User.query.filter_by(username=username).first()
 
-        if user_exists:
-            return jsonify({"error": "User already exists"}), 409
+        if existing_user:
+            return jsonify({"error": "Username is already in use. Please choose a different one."}), 409
 
-        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')  
+        # Check if the email address is already registered
+        existing_email = User.query.filter_by(email=email).first()
 
-        new_user = User(username=username, email=email, password=hashed_password)  
+        if existing_email:
+            return jsonify({"error": "Email address is already registered. Please use a different one."}), 409
+
+        # Hash the password
+        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+
+        # Create a new user
+        new_user = User(username=username, email=email, password=hashed_password)
         db.session.add(new_user)
         db.session.commit()
 
+        # Log in the user by setting their user ID in the session
         session["user_id"] = new_user.id
 
         return jsonify({
@@ -69,9 +83,21 @@ def register():
         # Return validation errors
         return jsonify({"errors": form.errors}), 400
 
+
+
+from flask import request, jsonify, session
+from forms import LoginForm  # Import the LoginForm
+
 @app.route("/login", methods=["POST"])
 def login_user():
-    form = LoginForm(request.form)
+    # Check if the request content type is JSON
+    if request.is_json:
+        # Login via JSON
+        data = request.get_json()
+        form = LoginForm(**data)
+    else:
+        # Login via form
+        form = LoginForm(request.form)
 
     if form.validate():
         username = form.username.data
@@ -87,24 +113,16 @@ def login_user():
 
         session["user_id"] = user.id
 
-        if user.user_role == 'admin':
-            # User is an admin, handle accordingly
-            return jsonify({
-                "id": user.id,
-                "email": user.email,
-                "user_role": user.user_role
-            })
-        else:
-            # User is a client, handle accordingly
-            return jsonify({
-                "id": user.id,
-                "email": user.email,
-                "user_role": user.user_role
-            })
+        return jsonify({
+            "id": user.id,
+            "email": user.email,
+            "user_role": user.user_role
+        })
     else:
         # Return validation errors
         return jsonify({"errors": form.errors}), 400
-    
+
+
 @app.route('/user', methods=['GET'])
 def get_user():
     if current_user.is_authenticated:

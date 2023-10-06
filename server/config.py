@@ -17,6 +17,6 @@ class Config:
     SESSION_TYPE = "redis"
     SESSION_PERMANENT = False
     SESSION_USE_SIGNER = True
-    SESSION_KEY_PREFIX = 'your_session_prefix:' 
+    SESSION_KEY_PREFIX = '10127b7e6ad8d8f492ed74f2' 
     SESSION_REDIS = redis.StrictRedis.from_url(os.environ.get("REDIS_URL", "redis://127.0.0.1:6379"))  # Use os.environ.get with a default value
 

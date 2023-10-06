@@ -63,11 +63,13 @@ export default function AuthProvider({ children }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, email, password, profile_image }),
       });
-
+  
       const data = await response.json();
-
+  
       if (response.ok) {
-        nav('/login');
+        // Set the user information in the context's currentUser state
+        setCurrentUser({ id: data.id, email: data.email, user_role: data.user_role });
+        nav('/'); // Redirect to the desired page after registration
         Swal.fire('Success', 'Registration successful', 'success');
         setOnChange(!onChange);
       } else {
@@ -78,6 +80,7 @@ export default function AuthProvider({ children }) {
       Swal.fire('Error', 'Something went wrong', 'error');
     }
   };
+  
 
   useEffect(() => {
     // Check if the user is already logged in

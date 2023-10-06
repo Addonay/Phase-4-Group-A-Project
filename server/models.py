@@ -1,9 +1,10 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_bcrypt import Bcrypt
 
 db = SQLAlchemy()
-
+bcrypt = Bcrypt()
 class User(db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -16,9 +17,11 @@ class User(db.Model):
     def __init__(self, username, email, password, profile_image=None):
         self.username = username
         self.email = email
-        self.password = password
+        self.password = self.hash_password(password) 
         self.profile_image = profile_image
 
+    def hash_password(self, password):
+        return bcrypt.generate_password_hash(password).decode('utf-8')
 class Car(db.Model):
     __tablename__ = "cars"
     id = db.Column(db.Integer, primary_key=True)
