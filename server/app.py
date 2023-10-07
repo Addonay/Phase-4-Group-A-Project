@@ -91,9 +91,9 @@ def login_user():
     data = request.get_json()
 
     # Create an instance of the LoginForm and populate it with the JSON data
-    form = LoginForm(**data)  # Use LoginForm instead of RegistrationForm
+    form = LoginForm(**data)
 
-    if form.validate_on_submit():  # Use validate_on_submit instead of validate
+    if form.validate_on_submit():
         username = form.username.data
         password = form.password.data
 
@@ -106,6 +106,9 @@ def login_user():
             return jsonify({"error": "Unauthorized"}), 401
 
         session["user_id"] = user.id
+
+        # if username == "admin":
+            # return redirect(url_for('admin_home'))  # Redirect to admin page
 
         return jsonify({
             "id": user.id,
