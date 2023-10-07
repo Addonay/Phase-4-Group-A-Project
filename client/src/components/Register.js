@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
@@ -9,131 +9,117 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { useNavigate, Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import { AuthContext } from '../contexts/AuthContext';
+import axios from 'axios';
 
 function Register() {
-  const navigate = useNavigate();
-  const { register } = useContext(AuthContext);
-
   const [formData, setFormData] = useState({
     username: '',
     email: '',
     password: '',
-    profile_image: null,
-    showPassword: false,
   });
 
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  const navigate = useNavigate();
+
   const handleChange = (e) => {
-    const { name, value, files } = e.target;
-
-    if (name === 'profile_image') {
-      setFormData({
-        ...formData,
-        [name]: files[0],
-      });
-    } else {
-      setFormData({
-        ...formData,
-        [name]: value,
-      });
-    }
-  };
-
-  const handleTogglePassword = () => {
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      showPassword: !formData.showPassword,
+      [name]: value,
     });
+  };
+
+  const handleTogglePasswordVisibility = () => {
+    setShowPassword((prevShowPassword) => !prevShowPassword);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
-      // Use the register function from AuthContext
-      await register(formData.username, formData.email, formData.password, formData.profile_image);
+      const response = await axios.post('http://127.0.0.1:5000/register', formData);
 
-      Swal.fire('Success', 'Registration successful', 'success');
-      navigate('/login');
+      if (response.status === 409) {
+        const data = response.data;
+        setError(data.error);
+      } else if (response.status === 400) {
+        const data = response.data;
+        setError(data.errors);
+      } else if (response.status === 200) {
+        const data = response.data;
+        setSuccess(`User with ID ${data.id} and email ${data.email} registered successfully!`);
+        Swal.fire({
+          icon: 'success',
+          title: 'Registration Successful',
+          text: `User with ID ${data.id} and email ${data.email} registered successfully!`,
+        });
+        navigate('/login');
+      }
     } catch (error) {
-      console.error('Error:', error.message);
-      Swal.fire('Error', 'Registration failed', 'error');
+      console.error('Error:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Registration Error',
+        text: 'An error occurred while registering. Please try again later.',
+      });
     }
   };
 
   return (
-    <Container component="main" maxWidth="xs">
-      <div>
-        <form onSubmit={handleSubmit}>
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Username"
-                name="username"
-                variant="outlined"
-                value={formData.username}
-                onChange={handleChange}
-                required
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Email"
-                name="email"
-                type="email"
-                variant="outlined"
-                value={formData.email}
-                onChange={handleChange}
-                required
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Password"
-                name="password"
-                type={formData.showPassword ? 'text' : 'password'}
-                variant="outlined"
-                value={formData.password}
-                onChange={handleChange}
-                required
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        onClick={handleTogglePassword}
-                        edge="end"
-                      >
-                        {formData.showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <input
-                type="file"
-                accept="image/*"
-                name="profile_image"
-                onChange={handleChange}
-              />
-            </Grid>
-          </Grid>
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            color="primary"
-            sx={{ mt: 3, mb: 2 }}
-          >
-            Register
-          </Button>
-          <Link to="/login">Already have an account? Log in</Link>
-        </form>
-      </div>
+    <Container>
+      <Grid container justifyContent="center" alignItems="center" style={{ height: '100vh' }}>
+        <Grid item xs={12} sm={6}>
+          <form onSubmit={handleSubmit}>
+            <TextField
+              label="Username"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              required
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              label="Email"
+              name="email"
+              type="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              label="Password"
+              name="password"
+              type={showPassword ? 'text' : 'password'} // Toggle password visibility
+              value={formData.password}
+              onChange={handleChange}
+              required
+              fullWidth
+              margin="normal"
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton edge="end" onClick={handleTogglePasswordVisibility}>
+                      {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <Button type="submit" variant="contained" color="primary" fullWidth>
+              Register
+            </Button>
+          </form>
+          <p>
+            Already have an account? <Link to="/login">Login</Link>
+          </p>
+        </Grid>
+      </Grid>
     </Container>
   );
 }

@@ -1,11 +1,11 @@
 from flask import Flask, jsonify, request, session
 from config import Config
-from models import db, User,Brand, Admin, Cart, Car, Purchase,Inquiry
+from models import db, User,Brand, Cart, Car, Purchase,Inquiry
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from flask_migrate import Migrate
 from forms import LoginForm, RegistrationForm
-from flask_login import LoginManager, logout_user,login_user, current_user, login_required
+from flask_login import LoginManager, logout_user, current_user, login_required
 from flask_session import Session  
 from flask_wtf.csrf import CSRFProtect
 
@@ -47,7 +47,7 @@ def register():
     # Create an instance of the RegistrationForm and populate it with the JSON data
     form = RegistrationForm(**data)
 
-    if form.validate():
+    if form.validate_on_submit():  # Use validate_on_submit instead of validate
         username = form.username.data
         email = form.email.data
         password = form.password.data
@@ -85,21 +85,15 @@ def register():
 
 
 
-from flask import request, jsonify, session
-from forms import LoginForm  # Import the LoginForm
-
 @app.route("/login", methods=["POST"])
 def login_user():
-    # Check if the request content type is JSON
-    if request.is_json:
-        # Login via JSON
-        data = request.get_json()
-        form = LoginForm(**data)
-    else:
-        # Login via form
-        form = LoginForm(request.form)
+    # Parse JSON data from the request
+    data = request.get_json()
 
-    if form.validate():
+    # Create an instance of the LoginForm and populate it with the JSON data
+    form = LoginForm(**data)  # Use LoginForm instead of RegistrationForm
+
+    if form.validate_on_submit():  # Use validate_on_submit instead of validate
         username = form.username.data
         password = form.password.data
 
@@ -121,6 +115,7 @@ def login_user():
     else:
         # Return validation errors
         return jsonify({"errors": form.errors}), 400
+
 
 
 @app.route('/user', methods=['GET'])

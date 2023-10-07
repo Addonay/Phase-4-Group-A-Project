@@ -1,27 +1,31 @@
-from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-from werkzeug.security import generate_password_hash, check_password_hash
+from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
+from flask_login import UserMixin
 
 db = SQLAlchemy()
 bcrypt = Bcrypt()
-class User(db.Model):
+
+class User(db.Model, UserMixin):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(150), unique=True)
     email = db.Column(db.String(150), unique=True)
     password = db.Column(db.Text, nullable=False)
-    profile_image = db.Column(db.String(255)) 
+    profile_image = db.Column(db.String(255), default="https://static.vecteezy.com/system/resources/previews/020/765/399/non_2x/default-profile-account-unknown-icon-black-silhouette-free-vector.jpg")
     user_role = db.Column(db.String(50), default='client')
-
-    def __init__(self, username, email, password, profile_image=None):
-        self.username = username
-        self.email = email
-        self.password = self.hash_password(password) 
-        self.profile_image = profile_image
+    created_at = db.Column(db.DateTime, default=datetime.utcnow())
 
     def hash_password(self, password):
         return bcrypt.generate_password_hash(password).decode('utf-8')
+    
+    def __init__(self, username, email, password, profile_image=None):
+        self.username = username
+        self.email = email
+        self.password = self.hash_password(password)
+        self.profile_image = profile_image
+
+
 class Car(db.Model):
     __tablename__ = "cars"
     id = db.Column(db.Integer, primary_key=True)
@@ -57,7 +61,7 @@ class Review(db.Model):
     car_id = db.Column(db.Integer, db.ForeignKey("cars.id"), nullable=False)
     rating = db.Column(db.Float)
     comment = db.Column(db.Text)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow())
 
 # Inquiry Model
 class Inquiry(db.Model):
@@ -66,7 +70,7 @@ class Inquiry(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     car_id = db.Column(db.Integer, db.ForeignKey("cars.id"), nullable=False)
     message = db.Column(db.Text)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow())
     status = db.Column(db.String(50))
 
 # Cart Model
@@ -76,7 +80,7 @@ class Cart(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     car_id = db.Column(db.Integer, db.ForeignKey("cars.id"), nullable=False)
     quantity = db.Column(db.Integer, default=1)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow())
 
 class Purchase(db.Model):
     __tablename__ = "purchases"
@@ -84,7 +88,7 @@ class Purchase(db.Model):
     user_id = db.Column(db.Integer, nullable=False) 
     car_id = db.Column(db.Integer, nullable=False)  
     admin_id = db.Column(db.Integer, db.ForeignKey('admins.id'), nullable=False)
-    purchase_date = db.Column(db.DateTime, default=datetime.utcnow)
+    purchase_date = db.Column(db.DateTime, default=datetime.utcnow())
 
 # Admin Model
 class Admin(db.Model):
@@ -95,7 +99,7 @@ class Admin(db.Model):
     password_hash = db.Column(db.String(255), nullable=False)
     full_name = db.Column(db.String(255))
     # Add more admin information fields as needed
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow())
 
     # Establish a one-to-many relationship with Purchase
     purchases = db.relationship('Purchase', backref='admin', lazy=True)
