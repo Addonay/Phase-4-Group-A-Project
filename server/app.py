@@ -4,9 +4,8 @@ from models import db, User,Brand, Cart, Car, Purchase,Inquiry
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from flask_migrate import Migrate
+from flask_jwt_extended import ( JWTManager, create_access_token, jwt_required, get_jwt_identity)
 from forms import LoginForm, RegistrationForm
-from flask_login import LoginManager, logout_user, current_user, login_required
-from flask_session import Session  
 from flask_wtf.csrf import CSRFProtect
 
 app = Flask(__name__)
@@ -14,19 +13,11 @@ app.config.from_object(Config)
 db.init_app(app)
 
 bcrypt = Bcrypt(app)
+jwt = JWTManager(app)
 
 CORS(app, supports_credentials=True)
 CSRFProtect(app)
 migrate = Migrate(app, db)
-Session(app)
-
-# Flask-Login setup
-login_manager = LoginManager()
-login_manager.init_app(app)
-
-@login_manager.user_loader
-def load_user(user_id):
-    return User.get_by_id(user_id)
 
 @app.route("/", methods=["GET"])
 def list_brands():
@@ -38,127 +29,66 @@ def list_brands():
 
     return jsonify(brands=brand_list)
 
-
-@app.route("/register", methods=["POST"])
+@app.route('/register', methods=['POST'])
 def register():
-    # Parse JSON data from the request
+    # Parse JSON data using the RegistrationForm
     data = request.get_json()
-
-    # Create an instance of the RegistrationForm and populate it with the JSON data
     form = RegistrationForm(**data)
 
-    if form.validate_on_submit():  # Use validate_on_submit instead of validate
-        username = form.username.data
-        email = form.email.data
-        password = form.password.data
-
-        # Check if the user already exists
-        existing_user = User.query.filter_by(username=username).first()
-
+    if form.validate():
+        # Check if the username or email already exists in the database
+        existing_user = User.query.filter_by(username=form.username.data).first()
         if existing_user:
-            return jsonify({"error": "Username is already in use. Please choose a different one."}), 409
+            return jsonify(message="Username is already in use"), 400
 
-        # Check if the email address is already registered
-        existing_email = User.query.filter_by(email=email).first()
-
+        existing_email = User.query.filter_by(email=form.email.data).first()
         if existing_email:
-            return jsonify({"error": "Email address is already registered. Please use a different one."}), 409
+            return jsonify(message="Email address is already registered"), 400
 
-        # Hash the password
-        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+        # Create a new user and add it to the database
+        new_user = User(
+            username=form.username.data,
+            email=form.email.data,
+            password=bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        )
 
-        # Create a new user
-        new_user = User(username=username, email=email, password=hashed_password)
         db.session.add(new_user)
         db.session.commit()
 
-        # Log in the user by setting their user ID in the session
-        session["user_id"] = new_user.id
-
-        return jsonify({
-            "id": new_user.id,
-            "email": new_user.email
-        })
+        # Create and return the JWT token
+        access_token = create_access_token(identity=new_user.id)
+        return jsonify(access_token=access_token), 201
     else:
-        # Return validation errors
-        return jsonify({"errors": form.errors}), 400
+        return jsonify(errors=form.errors), 400
 
-
-
-@app.route("/login", methods=["POST"])
-def login_user():
-    # Parse JSON data from the request
+@app.route('/login', methods=['POST'])
+def login():
+    # Parse JSON data using the LoginForm
     data = request.get_json()
-
-    # Create an instance of the LoginForm and populate it with the JSON data
     form = LoginForm(**data)
 
-    if form.validate_on_submit():
-        username = form.username.data
-        password = form.password.data
+    if form.validate():
+        # Find the user by username in the database
+        user = User.query.filter_by(username=form.username.data).first()
 
-        user = User.query.filter_by(username=username).first()
+        if user and bcrypt.check_password_hash(user.password, form.password.data):
+            # Create and return the JWT token
+            access_token = create_access_token(identity=user.id)
+            return jsonify(access_token=access_token), 200
 
-        if user is None:
-            return jsonify({"error": "Unauthorized Access"}), 401
+    return jsonify(message="Invalid username or password"), 401
 
-        if not bcrypt.check_password_hash(user.password, password):
-            return jsonify({"error": "Unauthorized"}), 401
+@app.route('/profile', methods=['GET'])
+@jwt_required
+def profile():
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
 
-        session["user_id"] = user.id
-
-        # if username == "admin":
-            # return redirect(url_for('admin_home'))  # Redirect to admin page
-
-        return jsonify({
-            "id": user.id,
-            "email": user.email,
-            "user_role": user.user_role
-        })
+    if user:
+        # Return the user's profile information (excluding password)
+        return jsonify(username=user.username, email=user.email), 200
     else:
-        # Return validation errors
-        return jsonify({"errors": form.errors}), 400
-
-
-
-@app.route('/user', methods=['GET'])
-def get_user():
-    if current_user.is_authenticated:
-        # User is authenticated, return user data
-        user_data = {
-            'id': current_user.id,
-            'email': current_user.email,
-            'user_role': current_user.user_role  # Include the user role
-        }
-        return jsonify(user_data), 200
-    else:
-        # User is not authenticated, return an empty response
-        return jsonify({}), 401
-
-
-
-@app.route('/logout', methods=['POST'])
-@login_required
-def logout():
-    logout_user()
-
-    # Clear Flask-Session data
-    session.pop('user_id', None)
-
-    return jsonify(message='Logged out successfully'), 200
-
-@app.route('/delete_account', methods=['DELETE'])
-@login_required
-def delete_account():
-    db.session.delete(current_user)
-    db.session.commit()
-    logout_user()
-
-    # Clear Flask-Session data
-    session.pop('user_id', None)
-
-    return jsonify(message='Your account has been deleted'), 200
-
+        return jsonify(message="User not found"), 404
 #cars
 @app.route('/<brand_name>/cars', methods=['GET'])
 def cars_by_brand(brand_name):
