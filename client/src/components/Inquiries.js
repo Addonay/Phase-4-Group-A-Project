@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import './Inquiries.css';
+
+
 
 function InquiryForm() {
   const [name, setName] = useState('');
@@ -33,7 +36,7 @@ function InquiryForm() {
   };
 
   return (
-    <div>
+    <div className="inquiry-form">
       <h2>Contact the Dealer</h2>
       <label>
         Name:

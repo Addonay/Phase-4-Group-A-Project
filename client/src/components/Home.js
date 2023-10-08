@@ -1,6 +1,6 @@
 import React from 'react';
-import Navbar from '../assets/Navbar'; // Corrected import path
-import Footer from '../assets/Footer'; // Corrected import path
+import Navbar from '../assets/Navbar.js'; // Corrected import path
+import Footer from '../assets/Footer.js'; // Corrected import path
 
 function Home() {
   return (
