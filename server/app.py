@@ -4,6 +4,7 @@ from models import db, Brand
 from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFProtect
+from flask_jwt_extended import JWTManager
 from routes.auth_routes import auth_bp
 from routes.admin_routes import admin_bp
 from routes.user_routes import user_bp
@@ -15,7 +16,7 @@ db.init_app(app)
 CORS(app, supports_credentials=True)
 CSRFProtect(app)
 migrate = Migrate(app, db)
-
+jwt = JWTManager(app)
 @app.route("/", methods=["GET"])
 def list_brands():
     # Retrieve a list of brands from the database

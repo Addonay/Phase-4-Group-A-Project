@@ -1,39 +1,44 @@
 import React, { useEffect, useState } from 'react';
 import Slideshow from '../assets/Slideshow';
 import { Link } from 'react-router-dom';
-import { Container, Typography, Grid, Card, CardMedia, Button } from '@mui/material';
-import { styled } from '@mui/system';
-import Navbar from "../assets/Navbar";
+import { Container, Typography, Grid, styled, Card, CardMedia } from '@mui/material';
+// import Navbar from "../assets/Navbar";
 
 const WelcomeContainer = styled(Container)({
-  marginTop: '1rem',
+  marginTop: '2rem', // Increase the top margin
   textAlign: 'center',
+  maxWidth: 'lg', // Adjust the maxWidth to control the container's width
 });
 
 const WelcomeText = styled(Typography)({
-  fontSize: '3rem',
+  fontSize: '4rem', // Increase the font size
   fontWeight: 'bold',
 });
 
 const ExploreText = styled(Typography)({
-  fontSize: '1.5rem',
+  fontSize: '2rem', // Increase the font size
   marginTop: '1rem',
 });
 
-const CardContainer = styled(Container)({
-  marginTop: '2rem',
-  display: 'flex',
-  flexDirection: 'row', // Display cards in a row
-  overflowX: 'auto', // Allow horizontal scrolling if needed
+const SlideshowContainer = styled(Container)({
+  height: '500px', // Increase the height of the Slideshow container
 });
 
-const CardImage = styled(Card)({
+const BottomImagesContainer = styled(Container)({
+  display: 'flex',
+  justifyContent: 'center',
+  marginBottom: '2cm', // Margin at the bottom
+});
+
+const SmallCard = styled(Card)({
+  width: '150px', // Adjust the width as needed
+  height: 'auto',
+  margin: '0 1rem', // Margin between cards
+});
+
+const SmallImage = styled(CardMedia)({
   width: '100%',
-  height: '30%',
-  objectFit: 'cover',
-  maxWidth: '150px', // Adjust the max width to reduce card size
-  margin: '5rem', // Add some margin between cards
-  objectPosition: 'absolute',
+  height: 'auto',
 });
 
 function Home() {
@@ -49,8 +54,7 @@ function Home() {
 
   return (
     <>
-    <Navbar />
-      <WelcomeContainer maxWidth="md">
+      <WelcomeContainer>
         <WelcomeText>
           Welcome to the Car Dealership App
         </WelcomeText>
@@ -58,20 +62,22 @@ function Home() {
           Explore our wide range of cars for sale.
         </ExploreText>
       </WelcomeContainer>
-      <Slideshow />
-      <CardContainer>
+      <SlideshowContainer>
+        <Slideshow />
+      </SlideshowContainer>
+      <BottomImagesContainer>
         {brands.map((brand) => (
-          <Card key={brand.id} style={{ flex: '0 0 auto' }}>
-            <Link to={`/${brand.name}/cars`} className="card">
-              <CardImage
+          <SmallCard key={brand.id}>
+            <Link to={`/${brand.name}/cars`} style={{ textDecoration: 'none' }}>
+              <SmallImage
                 component="img"
                 alt={brand.name}
                 src={brand.image_url}
               />
             </Link>
-          </Card>
+          </SmallCard>
         ))}
-      </CardContainer>
+      </BottomImagesContainer>
     </>
   );
 }

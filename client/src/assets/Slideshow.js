@@ -1,4 +1,15 @@
 import React, { Component } from 'react';
+import { Card, CardMedia, styled } from '@mui/material';
+
+const StyledCard = styled(Card)({
+  maxWidth: '800px',
+  margin: 'auto',
+  marginTop: '1rem',
+});
+
+const StyledCardMedia = styled(CardMedia)({
+  height: '400px', // Adjust the height as needed
+});
 
 // Define your dynamic content data
 const slideshowData = [
@@ -30,26 +41,23 @@ class Slideshow extends Component {
   }
 
   nextImage = () => {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       currentIndex: (prevState.currentIndex + 1) % slideshowData.length,
     }));
   };
 
   render() {
     const { currentIndex } = this.state;
+
     return (
-        <div className="card mx-auto mt-1" style={{ width: '800px' }}>
-          <img
-            className="card-img-top"
-            src={slideshowData[currentIndex].imageSrc}
-            alt={`Slide ${currentIndex}`}
-            style={{ width: '100%', height: '100%' }} // Set fixed width and height
-          />
-        </div>
-      );
-      
-      
-      
+      <StyledCard>
+        <StyledCardMedia
+          component="img"
+          alt={`Slide ${currentIndex}`}
+          src={slideshowData[currentIndex].imageSrc}
+        />
+      </StyledCard>
+    );
   }
 }
 

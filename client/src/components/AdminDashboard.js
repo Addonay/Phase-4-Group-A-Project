@@ -1,5 +1,7 @@
+// Import necessary libraries and components
 import React, { Component } from 'react';
-import { Container, Typography, Paper, Grid } from '@mui/material';
+import { Container, Typography, Paper, Grid, Button } from '@mui/material';
+import { Link } from 'react-router-dom'; // Import Link from react-router-dom
 import axios from 'axios';
 
 class AdminDashboard extends Component {
@@ -60,6 +62,19 @@ class AdminDashboard extends Component {
             </Paper>
           </Grid>
           {/* Add more statistics here */}
+        </Grid>
+        {/* Add widgets as links to tables */}
+        <Grid container spacing={2} style={{ marginTop: '16px' }}>
+          <Grid item xs={12} sm={6} md={4}>
+            <Button component={Link} to="users" variant="contained" color="primary">
+              Manage Users
+            </Button>
+          </Grid>
+          <Grid item xs={12} sm={6} md={4}>
+            <Button component={Link} to="cars" variant="contained" color="primary">
+              Manage Cars
+            </Button>
+          </Grid>
         </Grid>
         {/* Add other dashboard components or widgets here */}
       </Container>

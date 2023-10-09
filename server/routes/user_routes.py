@@ -39,26 +39,51 @@ def cars_by_brand(brand_name):
         return jsonify({'message': 'Brand not found', 'brand': brand_name}), 404
 
 # User cart
-@user_bp.route('/cart', methods=['GET'])
+@user_bp.route('/cart', methods=['GET', 'POST'])
 @jwt_required
 def user_cart():
     user_id = get_jwt_identity()
-    cart_items = Cart.query.filter_by(user_id=user_id).all()
 
-    if cart_items:
-        cart_data = [
-            {
-                'id': item.id,
-                'car_id': item.car_id,
-                'quantity': item.quantity,
-                "price": item.price,
-            }
-            for item in cart_items
-        ]
+    if request.method == 'GET':
+        # Handle GET request to fetch the user's cart
+        cart_items = Cart.query.filter_by(user_id=user_id).all()
 
-        return jsonify({'cart_items': cart_data}), 200
-    else:
-        return jsonify({'message': 'Cart is empty'}), 200
+        if cart_items:
+            cart_data = [
+                {
+                    'id': item.id,
+                    'car_id': item.car_id,
+                    'quantity': item.quantity,
+                    "price": item.price,
+                }
+                for item in cart_items
+            ]
+
+            return jsonify({'cart_items': cart_data}), 200
+        else:
+            return jsonify({'message': 'Cart is empty'}), 200
+
+    elif request.method == 'POST':
+        # Handle POST request to add an item to the user's cart
+        data = request.json
+        car_id = data.get('car_id')
+        quantity = data.get('quantity')
+
+        # Check if the user already has an existing cart item for the same car_id
+        existing_cart_item = Cart.query.filter_by(user_id=user_id, car_id=car_id).first()
+
+        if existing_cart_item:
+            # If the item already exists, update the quantity
+            existing_cart_item.quantity += quantity
+            db.session.commit()
+        else:
+            # If it doesn't exist, create a new cart item
+            new_cart_item = Cart(user_id=user_id, car_id=car_id, quantity=quantity)
+            db.session.add(new_cart_item)
+            db.session.commit()
+
+        return jsonify({'message': 'Item added to cart successfully'}), 201
+
 
 # Make purchase
 @user_bp.route('/purchase/<int:car_id>', methods=['POST'])

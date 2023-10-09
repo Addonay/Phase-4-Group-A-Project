@@ -8,8 +8,8 @@ import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import Checkbox from '@mui/material/Checkbox'; // Import Checkbox
-import { useHistory } from "react-router-dom";
+import Checkbox from '@mui/material/Checkbox';
+import { useNavigate, Link } from "react-router-dom"; // Import Link
 import Swal from 'sweetalert2';
 
 const Login = () => {
@@ -23,7 +23,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   const { username, password } = formData;
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({
@@ -44,9 +44,9 @@ const Login = () => {
     localStorage.setItem('access_token', access_token);
     // Redirect based on the username
     if (username === 'admin') {
-      history.push('/admindashboard');
+      navigate('/admindashboard');
     } else {
-      history.push('/userprofile');
+      navigate('/userprofile');
     }
   };
 
@@ -114,6 +114,7 @@ const Login = () => {
               Login
             </Button>
           </form>
+          <p>Don't have an account? <Link to="/auth/register">Register</Link></p> {/* Register link */}
         </Grid>
       </Grid>
     </Container>
