@@ -6,6 +6,7 @@ import Register from './components/Register';
 import UserProfile from './components/UserDashboard';
 import BrandShowcase from './components/Brands';
 import CartPage from './components/Cart';
+import AdminDashboard from ".components/AdminDashboard";
 
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
       <Route path="/userprofile" element={<UserProfile />} />
       <Route path="/:brandName/cars" element={<BrandShowcase />} />
       <Route path='/:username/cart' element={<CartPage />}/>
+      <Route path="/admin/dashboard" element={<AdminDashboard} />
     </Routes>
   );
 }

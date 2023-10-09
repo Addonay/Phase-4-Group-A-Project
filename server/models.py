@@ -1,6 +1,6 @@
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
-from flask_bcrypt import Bcrypt, generate_password_hash, check_password_hash
+from flask_bcrypt import Bcrypt
 from flask_login import UserMixin
 
 db = SQLAlchemy()
@@ -19,12 +19,19 @@ class User(db.Model, UserMixin):
     def hash_password(self, password):
         return bcrypt.generate_password_hash(password).decode('utf-8')
     
-    def __init__(self, username, email, password, profile_image=None):
+
+    def __init__(self, username, email, password, profile_image=None, user_role='client'):
         self.username = username
         self.email = email
         self.password = self.hash_password(password)
         self.profile_image = profile_image
+        self.user_role = user_role
+        self.created_at = datetime.utcnow() 
 
+
+    reviews = db.relationship("Review", backref="user", lazy=True)  # Relationship with reviews
+    carts = db.relationship("Cart", backref="user", lazy=True)  # Relationship with user's cart
+    purchases = db.relationship("Purchase", backref="user", lazy=True)  # Relationship with user's purchases
 
 class Car(db.Model):
     __tablename__ = "cars"
@@ -35,60 +42,62 @@ class Car(db.Model):
     price = db.Column(db.Float, nullable=False)
     description = db.Column(db.Text)
     image_url = db.Column(db.String(255))
-    admin_id = db.Column(db.Integer, db.ForeignKey('admins.id'), nullable=False)
     brand_id = db.Column(db.Integer, db.ForeignKey('brands.id'), nullable=False)
 
-    def __init__(self, make, model, year, price, description=None, image_url=None, admin_id=None, brand_id=None):
+    def __init__(self, make, model, year, price, description=None, image_url=None, brand_id=None):
         self.make = make
         self.model = model
         self.year = year
         self.price = price
         self.description = description
         self.image_url = image_url
-        self.admin_id = admin_id
         self.brand_id = brand_id
 
+
         # Relationships
-    reviews = db.relationship("Review", backref="car", lazy=True)
-    inquiries = db.relationship("Inquiry", backref="car", lazy=True)
-    carts = db.relationship("Cart", backref="car", lazy=True)
+    reviews = db.relationship("Review", backref="car", lazy=True)  # Relationship with reviews
+    carts = db.relationship("Cart", backref="car", lazy=True)  # Relationship with carts
+    purchases = db.relationship("Purchase", backref="car", lazy=True)  # Relationship with purchases
 
 # Review Model
 class Review(db.Model):
     __tablename__ = "reviews"
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    car_id = db.Column(db.Integer, db.ForeignKey("cars.id"), nullable=False)
-    rating = db.Column(db.Float)
+    username = db.Column(db.Integer, db.ForeignKey("users.username"), nullable=False)  # Reference to User
+    car_make = db.Column(db.String(100), db.ForeignKey("cars.make"), nullable=False)  # Reference to Car
     comment = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow())
 
-# Inquiry Model
-class Inquiry(db.Model):
-    __tablename__ = "inquiries"
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    car_id = db.Column(db.Integer, db.ForeignKey("cars.id"), nullable=False)
-    message = db.Column(db.Text)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow())
-    status = db.Column(db.String(50))
+    def __init__(self, username, car_make, comment):
+        self.username = username
+        self.car_make = car_make
+        self.comment = comment
+
 
 # Cart Model
 class Cart(db.Model):
     __tablename__ = "carts"
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    car_id = db.Column(db.Integer, db.ForeignKey("cars.id"), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)  # Reference to User
+    car_id = db.Column(db.Integer, db.ForeignKey("cars.id"), nullable=False)  # Reference to Car
     quantity = db.Column(db.Integer, default=1)
     created_at = db.Column(db.DateTime, default=datetime.utcnow())
+
 
 class Purchase(db.Model):
     __tablename__ = "purchases"
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, nullable=False) 
-    car_id = db.Column(db.Integer, nullable=False)  
-    admin_id = db.Column(db.Integer, db.ForeignKey('admins.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)  # Reference to User
+    car_id = db.Column(db.Integer, db.ForeignKey("cars.id"), nullable=False)  # Reference to Car
+    price = db.Column(db.Float, nullable=False)
     purchase_date = db.Column(db.DateTime, default=datetime.utcnow())
+    status = db.Column(db.String(50), default='pending')
+
+
+    def __init__(self, car_make, price, status=None ):
+        self.car_make = car_make
+        self.price = price
+        self.status = status
 
 # Admin Model
 class Admin(db.Model):
@@ -96,46 +105,25 @@ class Admin(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(150), unique=True, nullable=False)
     email = db.Column(db.String(150), unique=True, nullable=False)
-    password_hash = db.Column(db.String(255), nullable=False)
-    full_name = db.Column(db.String(255))
-    # Add more admin information fields as needed
+    password = db.Column(db.Text, nullable=False)
+    full_name = db.Column(db.String(150), nullable=True)
+    address = db.Column(db.String(255), nullable=True)
+    mobile_number = db.Column(db.String(20), nullable=True)
+    profile_image = db.Column(db.String(255), default="https://static.vecteezy.com/system/resources/previews/020/765/399/non_2x/default-profile-account-unknown-icon-black-silhouette-free-vector.jpg")
     created_at = db.Column(db.DateTime, default=datetime.utcnow())
 
-    # Establish a one-to-many relationship with Purchase
-    purchases = db.relationship('Purchase', backref='admin', lazy=True)
-
-    def __init__(self, username, email, password, full_name=None):
+    def __init__(self, username, email, password, full_name=None, address=None, mobile_number=None, profile_image=None):
         self.username = username
         self.email = email
-        self.password_hash = generate_password_hash(password)
+        self.password = self.hash_password(password)
         self.full_name = full_name
+        self.address = address
+        self.mobile_number = mobile_number
+        self.profile_image = profile_image
 
-    def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
+    def hash_password(self, password):
+        return bcrypt.generate_password_hash(password).decode('utf-8')
 
-    def add_car(self, make, model, price, description, image_url):
-        car = Car(make=make, model=model, price=price, description=description, image_url=image_url, admin_id=self.id)
-        db.session.add(car)
-        db.session.commit()
-
-    def update_car(self, car_id, make, model, price, description, image_url):
-        car = Car.query.get(car_id)
-        if car:
-            car.make = make
-            car.model = model
-            car.price = price
-            car.description = description
-            car.image_url = image_url
-            db.session.commit()
-
-    def delete_car(self, car_id):
-        car = Car.query.get(car_id)
-        if car:
-            db.session.delete(car)
-            db.session.commit()
-
-    def view_purchases(self):
-        return Purchase.query.all()
 
     
 class Brand(db.Model):
