@@ -1,56 +1,76 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { AuthContext } from '../contexts/AuthContext'; 
-import Rate from "../assets/Rate";
+import { useCart } from '../CartContext'; // Import useCart hook
 
-function BrandShowcase() {
+const BrandShowcase = () => {
   const { brandName } = useParams();
-  const [cars, setCars] = useState([]);
-  const { current_user } = useContext(AuthContext);
+  const [brandData, setBrandData] = useState({ cars: [], brand: '' });
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Use the useCart hook to access addToCart function and cart items
+  const { addToCart, cartItems } = useCart();
 
   useEffect(() => {
-    // Fetch cars by brandName from your API
+    // Simulate user authentication (replace with your actual logic)
+    const fakeUserAuthentication = setTimeout(() => {
+      setIsAuthenticated(true); // Set isAuthenticated to true after 2 seconds
+    }, 2000);
+
+    // Clear the timeout to prevent memory leaks
+    return () => clearTimeout(fakeUserAuthentication);
+  }, []);
+
+  useEffect(() => {
+    // Fetch car data for the specified brand from the backend when the component mounts
     fetch(`http://127.0.0.1:5000/${brandName}/cars`)
       .then((response) => response.json())
-      .then((data) => setCars(data.cars))
-      .catch((error) => console.error('Error fetching cars:', error));
+      .then((data) => setBrandData(data))
+      .catch((error) => console.error('Error fetching brand data:', error));
   }, [brandName]);
 
+  const { cars, brand } = brandData;
+
+  // Function to add a car to the cart
+  const handleAddToCart = (car) => {
+    addToCart(car); // Use the addToCart function from the context
+    alert(`${car.make} ${car.model} has been added to your cart.`);
+  };
+  
   return (
-    <div>
-      <h1>Cars by {brandName}</h1>
-      <div className="row">
-        {cars.map((car) => (
-          <div key={car.id} className="col-md-4 mb-4">
-            <div className="card">
-              <img
-                className="card-img-top"
-                src={car.image_url}
-                alt={`${car.make} ${car.model}`}
-              />
-              <div className="card-body">
-                <h5 className="card-title">{car.make} {car.model}</h5>
-                <p className="card-text">Year: {car.year}</p>
-                <p className="card-text">Price: ${car.price}</p>
-                {car.description && <p className="card-text">{car.description}</p>}
-                <Rate/>
-                {/* Conditional rendering based on user authentication */}
-                {current_user ? (
-                <Link to={`/${current_user.username}/cart`}>
-                  <button className="btn btn-primary">Add to Cart</button>
-                </Link>
-              ) : (
-                <Link to="/login">
-                  <button className="btn btn-secondary">Login to Add to Cart</button>
-                </Link>
-              )}
+    <>
+      <div className="container mx-auto p-4">
+        <h1 className="text-4xl font-bold mb-4">{`Cars by ${brand}`}</h1>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          {cars && cars.length > 0 ? (
+            cars.map((car) => (
+              <div key={car.id} className="bg-white rounded-lg shadow-md overflow-hidden">
+                <img src={car.image_url} alt={`${car.make} ${car.model}`} className="w-full h-48 object-cover" />
+                <div className="p-4">
+                  <h2 className="text-xl font-semibold mb-2">{`${car.make} ${car.model}`}</h2>
+                  <p className="text-gray-600">Price: ${car.price}</p>
+                  <p className="text-gray-600">Description: {car.description}</p>
+                  {isAuthenticated ? (
+                    <button
+                      className="bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded mt-2"
+                      onClick={() => handleAddToCart(car)} // Call handleAddToCart function on button click
+                    >
+                      Add to Cart
+                    </button>
+                  ) : (
+                    <p className="text-red-600 mt-2">
+                      You need to <Link to="/login" className="text-blue-600">log in</Link> to add to cart.
+                    </p>
+                  )}
+                </div>
               </div>
-            </div>
-          </div>
-        ))}
+            ))
+          ) : (
+            <p>No cars found for this brand</p>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
-}
+};
 
 export default BrandShowcase;

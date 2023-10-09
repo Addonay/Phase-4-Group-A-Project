@@ -41,7 +41,7 @@ function Navbar() {
                 Home
               </Typography>
             </Link>
-            <Link to="/login" style={{ textDecoration: 'none', color: 'white' }}>
+            <Link to="/auth/login" style={{ textDecoration: 'none', color: 'white' }}>
               <Typography variant="h6" component="div" sx={{ mr: 2 }}>
                 Login
               </Typography>
@@ -49,6 +49,11 @@ function Navbar() {
             <Link to="/userprofile" style={{ textDecoration: 'none', color: 'white' }}>
               <Typography variant="h6" component="div" sx={{ mr: 2 }}>
                 Profile
+              </Typography>
+            </Link>
+            <Link to="/cart" style={{ textDecoration: 'none', color: 'white' }}>
+              <Typography variant="h6" component="div" sx={{ mr: 2 }}>
+                Cart
               </Typography>
             </Link>
           </>
@@ -75,13 +80,18 @@ function Navbar() {
           </Link>
         </MenuItem>
         <MenuItem onClick={handleMenuClose}>
-          <Link to="/login" style={{ textDecoration: 'none', color: 'black' }}>
+          <Link to="/auth/login" style={{ textDecoration: 'none', color: 'black' }}>
             Login
           </Link>
         </MenuItem>
         <MenuItem onClick={handleMenuClose}>
           <Link to="/userprofile" style={{ textDecoration: 'none', color: 'black' }}>
             Profile
+          </Link>
+        </MenuItem>
+        <MenuItem onClick={handleMenuClose}>
+          <Link to="/cart" style={{ textDecoration: 'none', color: 'black' }}>
+            Cart
           </Link>
         </MenuItem>
       </Menu>
