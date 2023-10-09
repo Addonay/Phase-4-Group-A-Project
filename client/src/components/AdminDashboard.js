@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Container, Typography, Paper, Grid } from '@mui/material';
 import axios from 'axios';
 
 class AdminDashboard extends Component {
@@ -31,25 +32,37 @@ class AdminDashboard extends Component {
 
   render() {
     return (
-      <div className="admin-dashboard">
-        <h1>Admin Dashboard</h1>
-        <div className="dashboard-stats">
-          <div className="stat">
-            <h3>Total Users</h3>
-            <p>{this.state.totalUsers}</p>
-          </div>
-          <div className="stat">
-            <h3>Total Cars</h3>
-            <p>{this.state.totalCars}</p>
-          </div>
-          <div className="stat">
-            <h3>Total Purchases</h3>
-            <p>{this.state.totalPurchases}</p>
-          </div>
+      <Container maxWidth="lg" style={{ backgroundColor: '#f0f0f0', height: '100vh' }}>
+        <Typography variant="h4" gutterBottom style={{ padding: '16px' }}>
+          Admin Dashboard
+        </Typography>
+        <Paper elevation={3} style={{ padding: '16px', marginBottom: '16px' }}>
+          <Typography variant="h6">Welcome, Admin!</Typography>
+          <Typography variant="body1">You have access to admin features.</Typography>
+        </Paper>
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={6} md={4}>
+            <Paper elevation={3} style={{ padding: '16px' }}>
+              <Typography variant="h6">Total Users</Typography>
+              <Typography variant="body1">{this.state.totalUsers}</Typography>
+            </Paper>
+          </Grid>
+          <Grid item xs={12} sm={6} md={4}>
+            <Paper elevation={3} style={{ padding: '16px' }}>
+              <Typography variant="h6">Total Cars</Typography>
+              <Typography variant="body1">{this.state.totalCars}</Typography>
+            </Paper>
+          </Grid>
+          <Grid item xs={12} sm={6} md={4}>
+            <Paper elevation={3} style={{ padding: '16px' }}>
+              <Typography variant="h6">Total Purchases</Typography>
+              <Typography variant="body1">{this.state.totalPurchases}</Typography>
+            </Paper>
+          </Grid>
           {/* Add more statistics here */}
-        </div>
+        </Grid>
         {/* Add other dashboard components or widgets here */}
-      </div>
+      </Container>
     );
   }
 }

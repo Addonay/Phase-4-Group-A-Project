@@ -8,113 +8,116 @@ import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import Checkbox from '@mui/material/Checkbox'; // Import Checkbox
+import { useHistory } from "react-router-dom";
 import Swal from 'sweetalert2';
 
-function Login() {
+const Login = () => {
   const [formData, setFormData] = useState({
     username: '',
     password: '',
   });
 
+  const [rememberMe, setRememberMe] = useState(false); // State for "Remember me" checkbox
+
   const [showPassword, setShowPassword] = useState(false);
 
+  const { username, password } = formData;
+  const history = useHistory();
+
   const handleChange = (e) => {
-    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: value,
+      [e.target.name]: e.target.value,
     });
   };
 
-  const handleTogglePasswordVisibility = () => {
-    setShowPassword((prevShowPassword) => !prevShowPassword);
+  const handleTogglePassword = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const handleRememberMe = () => {
+    setRememberMe(!rememberMe);
+  };
+
+  const handleLoginSuccess = (access_token) => {
+    localStorage.setItem('access_token', access_token);
+    // Redirect based on the username
+    if (username === 'admin') {
+      history.push('/admindashboard');
+    } else {
+      history.push('/userprofile');
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const response = await axios.post('http://127.0.0.1:5000/login', formData);
 
-      if (response.status === 401) {
-        const data = response.data;
-        Swal.fire({
-          icon: 'error',
-          title: 'Unauthorized',
-          text: data.error,
-        });
-      } else if (response.status === 200) {
-        const data = response.data;
-        Swal.fire({
-          icon: 'success',
-          title: 'Login Successful',
-          text: `Welcome, ${data.username}!`,
-        });
-        // Redirect to the appropriate dashboard based on user_role or perform other actions
-      }
+    try {
+      const response = await axios.post('http://127.0.0.1:5000/auth/login', {
+        username,
+        password,
+      });
+
+      const { access_token } = response.data;
+      handleLoginSuccess(access_token);
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Login failed:', error);
       Swal.fire({
         icon: 'error',
-        title: 'Login Error',
-        text: 'An error occurred while logging in. Please try again later.',
+        title: 'Login Failed',
+        text: 'Invalid username or password',
       });
     }
   };
-  // Add Axios request interceptor to log requests
-  axios.interceptors.request.use((config) => {
-    console.log('Request:', config);
-    return config;
-  });
 
-  // Add Axios response interceptor to log responses
-  axios.interceptors.response.use((response) => {
-    console.log('Response:', response);
-    return response;
-  }, (error) => {
-    console.error('Error:', error);
-    return Promise.reject(error);
-  });
   return (
     <Container>
       <Grid container justifyContent="center" alignItems="center" style={{ height: '100vh' }}>
-        <Grid item xs={12} sm={6}>
+        <Grid item xs={12} sm={8} md={6} lg={4}>
           <form onSubmit={handleSubmit}>
             <TextField
               label="Username"
               name="username"
-              value={formData.username}
+              value={username}
               onChange={handleChange}
-              required
               fullWidth
               margin="normal"
+              required
             />
             <TextField
               label="Password"
               name="password"
-              type={showPassword ? 'text' : 'password'}
-              value={formData.password}
+              value={password}
               onChange={handleChange}
-              required
               fullWidth
               margin="normal"
+              required
+              type={showPassword ? 'text' : 'password'}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
-                    <IconButton edge="end" onClick={handleTogglePasswordVisibility}>
-                      {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                    <IconButton onClick={handleTogglePassword} edge="end">
+                      {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
                     </IconButton>
                   </InputAdornment>
                 ),
               }}
             />
+            <Checkbox
+              checked={rememberMe}
+              onChange={handleRememberMe}
+              color="primary"
+            />
+            <label>Remember me</label>
             <Button type="submit" variant="contained" color="primary" fullWidth>
-              Log In
+              Login
             </Button>
           </form>
         </Grid>
       </Grid>
     </Container>
   );
-}
+};
 
 export default Login;
